@@ -1,0 +1,2178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vantage MOC | Management of Change System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --green-primary:#00B388;
+    --green-medium:#008264;
+    --green-dark:#038264;
+    --green-bright:#97C93C;
+    --blue-dark:#015FB4;
+    --blue:#1D8FB4;
+    --orange:#F58558;
+    --yellow:#FFCB7B;
+    --charcoal:#161617;
+    --grey-text:#3d3b3e;
+    --grey-med:#757575;
+    --grey-light:#e6e4e6;
+    --grey-lighter:#f5f6f8;
+    --white:#ffffff;
+    --red:#d64545;
+    --shadow-sm:0 1px 3px rgba(22,22,23,.06);
+    --shadow:0 4px 16px rgba(22,22,23,.08);
+    --shadow-lg:0 12px 40px rgba(22,22,23,.12);
+    --radius:10px;
+    --radius-sm:6px;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{font-family:'Poppins',sans-serif;color:var(--charcoal);background:var(--grey-lighter);font-size:14px;line-height:1.5}
+  button{font-family:inherit;cursor:pointer;border:none;background:none}
+  input,select,textarea{font-family:inherit;font-size:14px}
+  a{color:var(--blue-dark);text-decoration:none}
+
+  /* ============== LAYOUT ============== */
+  .app{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+
+  .sidebar{
+    background:linear-gradient(180deg,#013d2e 0%,#015a44 100%);
+    color:#fff;padding:24px 0;position:sticky;top:0;height:100vh;overflow-y:auto;
+  }
+  .logo{display:flex;align-items:center;gap:10px;padding:0 24px 28px 24px;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:20px}
+  .logo-mark{width:34px;height:34px;background:radial-gradient(circle at 30% 30%,var(--green-bright),var(--green-primary) 60%,var(--green-dark));border-radius:50% 50% 50% 8%;transform:rotate(-12deg);box-shadow:inset -2px -3px 6px rgba(0,0,0,.2)}
+  .logo-text{font-weight:700;font-size:20px;letter-spacing:-.5px}
+  .logo-text .tm{font-size:9px;vertical-align:super;opacity:.7;font-weight:500}
+  .logo-sub{font-size:10px;font-weight:500;letter-spacing:2px;text-transform:uppercase;opacity:.6;margin-top:2px}
+
+  .nav-section{padding:0 12px;margin-bottom:8px}
+  .nav-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,.4);padding:8px 14px 6px}
+  .nav-item{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:8px;color:rgba(255,255,255,.78);font-weight:500;cursor:pointer;margin-bottom:2px;transition:all .15s;font-size:13.5px}
+  .nav-item:hover{background:rgba(255,255,255,.06);color:#fff}
+  .nav-item.active{background:rgba(0,179,136,.18);color:#fff;box-shadow:inset 3px 0 0 var(--green-primary)}
+  .nav-item .icon{width:18px;height:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .nav-badge{margin-left:auto;background:var(--green-primary);color:#013d2e;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px}
+
+  /* ============== TOP BAR ============== */
+  .main{display:flex;flex-direction:column;min-width:0}
+  .topbar{background:#fff;padding:14px 32px;border-bottom:1px solid var(--grey-light);display:flex;align-items:center;gap:20px;position:sticky;top:0;z-index:50}
+  .topbar-search{flex:1;max-width:380px;position:relative}
+  .topbar-search input{width:100%;padding:9px 14px 9px 38px;border:1px solid var(--grey-light);border-radius:8px;background:var(--grey-lighter);transition:all .15s}
+  .topbar-search input:focus{outline:none;background:#fff;border-color:var(--green-primary);box-shadow:0 0 0 3px rgba(0,179,136,.12)}
+  .topbar-search::before{content:"⌕";position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--grey-med);font-size:16px}
+  .topbar-right{margin-left:auto;display:flex;align-items:center;gap:14px}
+
+  .selector{position:relative}
+  .selector-btn{display:flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid var(--grey-light);border-radius:8px;background:#fff;font-weight:500;font-size:13px;color:var(--charcoal);transition:all .15s}
+  .selector-btn:hover{border-color:var(--green-primary)}
+  .selector-btn .pip{width:8px;height:8px;border-radius:50%;background:var(--green-primary)}
+  .selector-btn .caret{margin-left:4px;color:var(--grey-med);font-size:10px}
+  .selector-menu{position:absolute;top:calc(100% + 6px);right:0;background:#fff;border:1px solid var(--grey-light);border-radius:10px;box-shadow:var(--shadow);min-width:240px;padding:6px;display:none;z-index:100}
+  .selector-menu.open{display:block}
+  .selector-option{padding:9px 12px;border-radius:6px;cursor:pointer;display:flex;align-items:center;gap:10px;font-size:13px}
+  .selector-option:hover{background:var(--grey-lighter)}
+  .selector-option.selected{background:rgba(0,179,136,.08);color:var(--green-dark);font-weight:600}
+  .selector-option .role-tag{margin-left:auto;font-size:10px;background:var(--grey-light);padding:2px 6px;border-radius:8px;color:var(--grey-text);font-weight:500}
+
+  .user-chip{display:flex;align-items:center;gap:10px;padding:6px 14px 6px 6px;border:1px solid var(--grey-light);border-radius:24px;background:#fff;font-size:13px;font-weight:500;transition:all .15s}
+  .user-chip:hover{border-color:var(--green-primary)}
+  .avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--green-primary),var(--green-dark));color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:12px;flex-shrink:0}
+  .user-chip .who{display:flex;flex-direction:column;align-items:flex-start;line-height:1.2}
+  .user-chip .who .role{font-size:10px;color:var(--grey-med);font-weight:500}
+
+  /* ============== CONTENT ============== */
+  .content{padding:28px 32px;flex:1;max-width:100%;overflow-x:hidden}
+  .page-head{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+  .page-title{font-size:26px;font-weight:700;letter-spacing:-.5px}
+  .page-sub{color:var(--grey-med);font-size:13px;margin-top:4px}
+  .breadcrumb{font-size:12px;color:var(--grey-med);margin-bottom:6px;display:flex;gap:6px;align-items:center}
+  .breadcrumb span:not(.sep){cursor:pointer}
+  .breadcrumb span:not(.sep):hover{color:var(--green-dark)}
+  .breadcrumb .sep{opacity:.4}
+
+  /* ============== BUTTONS ============== */
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:8px;font-weight:600;font-size:13px;transition:all .15s;border:1px solid transparent;white-space:nowrap}
+  .btn-primary{background:var(--green-primary);color:#fff}
+  .btn-primary:hover{background:var(--green-medium);transform:translateY(-1px);box-shadow:0 4px 10px rgba(0,179,136,.3)}
+  .btn-secondary{background:#fff;color:var(--charcoal);border-color:var(--grey-light)}
+  .btn-secondary:hover{border-color:var(--green-primary);color:var(--green-dark)}
+  .btn-ghost{background:transparent;color:var(--grey-text)}
+  .btn-ghost:hover{background:var(--grey-light)}
+  .btn-danger{background:#fff;color:var(--red);border-color:#f0c4c4}
+  .btn-danger:hover{background:#fdf0f0}
+  .btn-blue{background:var(--blue-dark);color:#fff}
+  .btn-blue:hover{background:#01477f}
+  .btn-sm{padding:6px 11px;font-size:12px}
+  .btn-lg{padding:12px 22px;font-size:14px}
+  .btn:disabled{opacity:.5;cursor:not-allowed;transform:none!important;box-shadow:none!important}
+
+  /* ============== STAT CARDS ============== */
+  .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:24px}
+  .stat{background:#fff;padding:18px 20px;border-radius:var(--radius);border:1px solid var(--grey-light);position:relative;overflow:hidden;transition:all .15s}
+  .stat:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+  .stat-label{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--grey-med);font-weight:600;margin-bottom:8px}
+  .stat-value{font-size:28px;font-weight:700;letter-spacing:-1px;line-height:1}
+  .stat-trend{font-size:11px;color:var(--green-dark);font-weight:600;margin-top:8px;display:flex;align-items:center;gap:4px}
+  .stat::after{content:"";position:absolute;top:0;right:0;width:60px;height:60px;border-radius:0 0 0 60px;opacity:.08}
+  .stat.draft::after{background:var(--grey-med)}
+  .stat.review::after{background:var(--orange)}
+  .stat.approved::after{background:var(--blue-dark)}
+  .stat.implement::after{background:var(--yellow)}
+  .stat.closed::after{background:var(--green-primary)}
+  .stat-icon{position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px}
+  .stat.draft .stat-icon{background:#eee;color:var(--grey-text)}
+  .stat.review .stat-icon{background:#fde8dc;color:#c45619}
+  .stat.approved .stat-icon{background:#dceaf7;color:var(--blue-dark)}
+  .stat.implement .stat-icon{background:#fff2d6;color:#a87311}
+  .stat.closed .stat-icon{background:#d4f0e6;color:var(--green-dark)}
+
+  /* ============== TABLE / REGISTER ============== */
+  .card{background:#fff;border-radius:var(--radius);border:1px solid var(--grey-light);overflow:hidden}
+  .card-head{padding:16px 20px;border-bottom:1px solid var(--grey-light);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  .card-title{font-weight:600;font-size:15px}
+  .filters{display:flex;gap:8px;flex-wrap:wrap}
+  .filter-chip{padding:6px 12px;background:var(--grey-lighter);border:1px solid transparent;border-radius:16px;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;color:var(--grey-text)}
+  .filter-chip:hover{background:var(--grey-light)}
+  .filter-chip.active{background:#013d2e;color:#fff;border-color:#013d2e}
+
+  table{width:100%;border-collapse:collapse}
+  th{text-align:left;padding:12px 20px;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--grey-med);background:var(--grey-lighter);border-bottom:1px solid var(--grey-light)}
+  td{padding:14px 20px;border-bottom:1px solid var(--grey-light);font-size:13px;vertical-align:middle}
+  tr:last-child td{border-bottom:none}
+  tr.row-link{cursor:pointer;transition:background .1s}
+  tr.row-link:hover{background:var(--grey-lighter)}
+  .moc-id{font-weight:600;color:var(--blue-dark);font-family:'Poppins',monospace;letter-spacing:.3px}
+  .moc-title{font-weight:500;max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .type-pill{display:inline-block;padding:3px 9px;border-radius:6px;font-size:11px;font-weight:600;letter-spacing:.3px}
+  .type-L1{background:#dceaf7;color:var(--blue-dark)}
+  .type-L2{background:#fde8dc;color:#c45619}
+  .type-MOOC{background:#f0e4f7;color:#6b3da0}
+  .type-BYPASS{background:#fde2e2;color:#a82929}
+  .type-ADDENDUM{background:#e7e7e7;color:var(--grey-text)}
+  .status{display:inline-flex;align-items:center;gap:6px;font-weight:600;font-size:12px}
+  .status .dot{width:7px;height:7px;border-radius:50%}
+  .status-draft{color:var(--grey-med)}.status-draft .dot{background:var(--grey-med)}
+  .status-review{color:#c45619}.status-review .dot{background:var(--orange)}
+  .status-approved{color:var(--blue-dark)}.status-approved .dot{background:var(--blue-dark)}
+  .status-implement{color:#a87311}.status-implement .dot{background:var(--yellow);box-shadow:0 0 0 3px rgba(255,203,123,.3)}
+  .status-closed{color:var(--green-dark)}.status-closed .dot{background:var(--green-primary)}
+  .status-rejected{color:var(--red)}.status-rejected .dot{background:var(--red)}
+
+  /* ============== FORM (MOC DETAIL) ============== */
+  .moc-detail{display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start}
+  @media(max-width:1100px){.moc-detail{grid-template-columns:1fr}}
+
+  .detail-head{background:#fff;border:1px solid var(--grey-light);border-radius:var(--radius);padding:20px 24px;margin-bottom:20px}
+  .detail-head-row{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  .detail-head h2{font-size:22px;font-weight:700;letter-spacing:-.4px;margin-bottom:6px}
+  .detail-meta{display:flex;gap:16px;flex-wrap:wrap;color:var(--grey-med);font-size:12px;margin-top:8px}
+  .detail-meta span strong{color:var(--charcoal);font-weight:600}
+
+  /* Workflow steps */
+  .workflow{display:flex;align-items:center;justify-content:space-between;margin-top:18px;padding-top:18px;border-top:1px dashed var(--grey-light);gap:4px}
+  .wf-step{flex:1;text-align:center;position:relative;font-size:11px;font-weight:600;color:var(--grey-med)}
+  .wf-step .dot{width:24px;height:24px;border-radius:50%;background:var(--grey-light);color:var(--grey-med);display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:11px;font-weight:700;transition:all .2s;border:2px solid #fff;box-shadow:0 0 0 2px var(--grey-light)}
+  .wf-step.done .dot{background:var(--green-primary);color:#fff;box-shadow:0 0 0 2px var(--green-primary)}
+  .wf-step.done{color:var(--green-dark)}
+  .wf-step.active .dot{background:#fff;color:var(--green-dark);box-shadow:0 0 0 2px var(--green-primary)}
+  .wf-step.active{color:var(--green-dark)}
+  .wf-step:not(:last-child)::after{content:"";position:absolute;top:12px;left:calc(50% + 16px);right:calc(-50% + 16px);height:2px;background:var(--grey-light);z-index:0}
+  .wf-step.done:not(:last-child)::after{background:var(--green-primary)}
+
+  /* Tabs */
+  .tabs{display:flex;gap:2px;background:#fff;border:1px solid var(--grey-light);border-radius:var(--radius) var(--radius) 0 0;border-bottom:none;padding:6px 6px 0 6px;flex-wrap:wrap}
+  .tab{padding:10px 16px;font-weight:500;font-size:13px;color:var(--grey-med);border-radius:8px 8px 0 0;cursor:pointer;border-bottom:2px solid transparent;transition:all .15s}
+  .tab:hover{color:var(--charcoal)}
+  .tab.active{color:var(--green-dark);background:var(--grey-lighter);border-bottom-color:var(--green-primary);font-weight:600}
+
+  .tab-content{background:#fff;border:1px solid var(--grey-light);border-radius:0 0 var(--radius) var(--radius);padding:24px}
+
+  /* Form fields */
+  .field-group{margin-bottom:18px}
+  .field-row{display:grid;gap:14px;margin-bottom:14px}
+  .field-row.cols-2{grid-template-columns:1fr 1fr}
+  .field-row.cols-3{grid-template-columns:1fr 1fr 1fr}
+  .field-row.cols-4{grid-template-columns:1fr 1fr 1fr 1fr}
+  @media(max-width:700px){.field-row.cols-2,.field-row.cols-3,.field-row.cols-4{grid-template-columns:1fr}}
+
+  label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--grey-med);font-weight:600;margin-bottom:6px}
+  label .req{color:var(--red);margin-left:2px}
+  input[type="text"],input[type="date"],input[type="number"],input[type="email"],select,textarea{
+    width:100%;padding:9px 12px;border:1px solid var(--grey-light);border-radius:8px;background:#fff;color:var(--charcoal);transition:all .15s
+  }
+  textarea{min-height:84px;resize:vertical;line-height:1.5}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--green-primary);box-shadow:0 0 0 3px rgba(0,179,136,.12)}
+  input:disabled,select:disabled,textarea:disabled{background:var(--grey-lighter);color:var(--grey-text);cursor:not-allowed}
+
+  .section-title{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--green-dark);margin:24px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--grey-light);display:flex;align-items:center;gap:8px}
+  .section-title:first-child{margin-top:0}
+  .section-title .bar{width:4px;height:14px;background:var(--green-primary);border-radius:2px}
+
+  .radio-group{display:flex;gap:18px;flex-wrap:wrap}
+  .radio-opt{display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px}
+  .radio-opt input{accent-color:var(--green-primary)}
+
+  .checklist{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px 16px}
+  .check-opt{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12.5px;padding:4px 0;color:var(--grey-text)}
+  .check-opt input{accent-color:var(--green-primary)}
+  .check-opt:has(input:checked){color:var(--charcoal);font-weight:500}
+
+  .checklist-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}
+  .checklist-table th{padding:8px 10px;background:var(--grey-lighter);font-size:10px}
+  .checklist-table td{padding:8px 10px;vertical-align:middle}
+  .checklist-table tr:hover td{background:var(--grey-lighter)}
+  .yn-cell{text-align:center;width:60px}
+  .yn-cell input{accent-color:var(--green-primary)}
+
+  /* Sign-off boxes */
+  .signoff-grid{display:grid;gap:12px}
+  .signoff{border:1px solid var(--grey-light);border-radius:10px;padding:14px 16px;background:var(--grey-lighter);display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .signoff-info{flex:1;min-width:200px}
+  .signoff-role{font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--grey-med);font-weight:600}
+  .signoff-person{font-weight:600;font-size:14px;margin-top:2px}
+  .signoff-stamp{display:flex;align-items:center;gap:10px}
+  .signoff-stamp .stamp{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1.5px dashed var(--green-primary);padding:6px 12px;border-radius:8px;color:var(--green-dark);font-weight:600;font-size:12px}
+  .signoff-stamp .date{font-size:11px;color:var(--grey-med)}
+  .signoff.pending{background:#fff8ed;border-color:#f7d8a8}
+  .signoff.signed{background:#eaf7f1;border-color:#b8e5d0}
+  .signoff.rejected{background:#fdf0f0;border-color:#f0c4c4}
+
+  /* Right rail (activity / docs) */
+  .rail{display:flex;flex-direction:column;gap:16px}
+  .rail-card{background:#fff;border:1px solid var(--grey-light);border-radius:var(--radius);padding:18px 20px}
+  .rail-card h3{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--grey-med);margin-bottom:14px}
+  .activity-item{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--grey-light);font-size:12.5px}
+  .activity-item:last-child{border-bottom:none}
+  .activity-dot{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--green-primary),var(--green-dark));color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:11px;flex-shrink:0}
+  .activity-body{flex:1;min-width:0}
+  .activity-meta{font-size:11px;color:var(--grey-med);margin-top:2px}
+
+  .comment-box{display:flex;gap:8px;margin-top:12px}
+  .comment-box textarea{min-height:60px;font-size:12.5px;padding:8px 10px}
+
+  /* ============== MODAL ============== */
+  .modal-bg{position:fixed;inset:0;background:rgba(22,22,23,.6);backdrop-filter:blur(4px);z-index:200;display:none;align-items:center;justify-content:center;padding:24px}
+  .modal-bg.open{display:flex}
+  .modal{background:#fff;border-radius:14px;max-width:560px;width:100%;padding:28px;box-shadow:var(--shadow-lg);max-height:90vh;overflow-y:auto}
+  .modal h3{font-size:20px;font-weight:700;margin-bottom:4px;letter-spacing:-.3px}
+  .modal p{color:var(--grey-med);font-size:13px;margin-bottom:20px}
+  .type-pick{display:grid;gap:10px}
+  .type-pick-opt{display:flex;align-items:flex-start;gap:14px;padding:14px;border:1.5px solid var(--grey-light);border-radius:10px;cursor:pointer;transition:all .15s}
+  .type-pick-opt:hover{border-color:var(--green-primary);background:#f5fdf9}
+  .type-pick-opt .ico{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+  .type-pick-opt .ico.l1{background:#dceaf7;color:var(--blue-dark)}
+  .type-pick-opt .ico.l2{background:#fde8dc;color:#c45619}
+  .type-pick-opt .ico.mooc{background:#f0e4f7;color:#6b3da0}
+  .type-pick-opt .ico.bypass{background:#fde2e2;color:#a82929}
+  .type-pick-opt .ico.addendum{background:#e7e7e7;color:var(--grey-text)}
+  .type-pick-opt .label{font-weight:600;font-size:14px}
+  .type-pick-opt .desc{font-size:12px;color:var(--grey-med);margin-top:2px;line-height:1.4}
+
+  .modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}
+
+  /* ============== FOOTER ACTIONS ============== */
+  .action-bar{position:sticky;bottom:0;background:rgba(255,255,255,.98);backdrop-filter:blur(8px);border-top:1px solid var(--grey-light);padding:14px 32px;display:flex;justify-content:space-between;align-items:center;gap:12px;margin:24px -32px -28px -32px;z-index:10}
+  .action-bar-info{font-size:12px;color:var(--grey-med)}
+
+  /* ============== PRINT ============== */
+  @media print{
+    .sidebar,.topbar,.action-bar,.rail,.tabs{display:none!important}
+    .app{display:block}
+    .content{padding:0}
+    .tab-content{border:none;padding:0;border-radius:0}
+    .moc-detail{grid-template-columns:1fr;gap:0}
+    .detail-head{border:2px solid var(--charcoal);page-break-inside:avoid}
+    .section-title{page-break-after:avoid}
+    .signoff{page-break-inside:avoid;background:#fff!important}
+    body{background:#fff;font-size:11pt}
+    .print-only{display:block!important}
+    .all-tabs-print > div{display:block!important;page-break-inside:avoid;margin-bottom:24px}
+    .all-tabs-print > div::before{content:attr(data-tab-name);display:block;font-size:14pt;font-weight:700;color:var(--green-dark);margin:20px 0 10px;padding-top:14px;border-top:2px solid var(--green-primary)}
+    button{display:none!important}
+    input,select,textarea{border:none!important;border-bottom:1px solid var(--charcoal)!important;border-radius:0!important;padding:2px 0!important;background:transparent!important;color:var(--charcoal)!important}
+    .print-header{display:flex!important;justify-content:space-between;align-items:center;border-bottom:3px solid var(--green-primary);padding-bottom:10px;margin-bottom:14px}
+  }
+  .print-only,.print-header{display:none}
+
+  /* Empty state */
+  .empty{text-align:center;padding:60px 20px;color:var(--grey-med)}
+  .empty .ico{font-size:48px;margin-bottom:14px;opacity:.4}
+  .empty h4{font-size:16px;color:var(--charcoal);margin-bottom:6px;font-weight:600}
+  .empty p{font-size:13px}
+
+  /* Toast */
+  .toast{position:fixed;bottom:24px;right:24px;background:var(--charcoal);color:#fff;padding:14px 20px;border-radius:10px;box-shadow:var(--shadow-lg);font-size:13px;font-weight:500;z-index:300;opacity:0;transform:translateY(10px);transition:all .2s;display:flex;align-items:center;gap:10px}
+  .toast.show{opacity:1;transform:translateY(0)}
+  .toast.success{background:var(--green-dark)}
+  .toast.error{background:var(--red)}
+  .toast .ico{font-size:16px}
+
+  /* Misc */
+  .pill{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;background:var(--grey-light);color:var(--grey-text)}
+  .pill.success{background:#d4f0e6;color:var(--green-dark)}
+  .pill.warn{background:#fff2d6;color:#a87311}
+  .pill.danger{background:#fde2e2;color:#a82929}
+  .pill.info{background:#dceaf7;color:var(--blue-dark)}
+
+  .doc-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--grey-light);font-size:12.5px}
+  .doc-row:last-child{border-bottom:none}
+  .doc-row .doc-name{display:flex;align-items:center;gap:8px}
+  .doc-row .doc-name::before{content:"📄";font-size:14px}
+
+  .info-banner{background:#f0f7ff;border-left:3px solid var(--blue-dark);padding:10px 14px;border-radius:0 8px 8px 0;font-size:12.5px;color:var(--charcoal);margin-bottom:16px;display:flex;align-items:flex-start;gap:10px}
+  .info-banner.warn{background:#fff8ed;border-color:var(--orange)}
+  .info-banner.success{background:#eaf7f1;border-color:var(--green-primary)}
+  .info-banner .ico{font-size:16px;flex-shrink:0}
+
+  details{margin-bottom:8px;background:var(--grey-lighter);border-radius:8px;padding:0;overflow:hidden}
+  details summary{padding:12px 14px;cursor:pointer;font-weight:600;font-size:13px;list-style:none;display:flex;align-items:center;gap:8px;user-select:none}
+  details summary::after{content:"+";margin-left:auto;font-size:18px;font-weight:300;transition:transform .2s}
+  details[open] summary::after{transform:rotate(45deg)}
+  details > div{padding:0 14px 14px 14px}
+
+  .hide{display:none!important}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-mark"></div>
+      <div>
+        <div class="logo-text">Vantage<span class="tm">®</span></div>
+        <div class="logo-sub">MOC System</div>
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Workspace</div>
+      <div class="nav-item active" data-view="dashboard">
+        <span class="icon">▦</span> Dashboard
+      </div>
+      <div class="nav-item" data-view="register">
+        <span class="icon">≡</span> MOC Register
+        <span class="nav-badge" id="navTotal">0</span>
+      </div>
+      <div class="nav-item" data-view="my-tasks">
+        <span class="icon">✓</span> My Approvals
+        <span class="nav-badge" id="navTasks">0</span>
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Modules</div>
+      <div class="nav-item" data-action="new-moc">
+        <span class="icon">+</span> New MOC
+      </div>
+      <div class="nav-item" data-view="bypass-log">
+        <span class="icon">⚠</span> Bypass Log
+      </div>
+      <div class="nav-item" data-view="reports">
+        <span class="icon">▤</span> Reports
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Admin</div>
+      <div class="nav-item" data-view="settings">
+        <span class="icon">⚙</span> Settings
+      </div>
+      <div class="nav-item" data-view="help">
+        <span class="icon">?</span> Help
+      </div>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <div class="main">
+    <!-- TOP BAR -->
+    <div class="topbar">
+      <div class="topbar-search">
+        <input type="text" placeholder="Search MOCs by ID, title, or owner..." id="globalSearch">
+      </div>
+      <div class="topbar-right">
+        <div class="selector" id="siteSelector">
+          <button class="selector-btn" onclick="toggleMenu('siteMenu')">
+            <span class="pip"></span>
+            <span id="currentSite">Gurnee, IL</span>
+            <span class="caret">▾</span>
+          </button>
+          <div class="selector-menu" id="siteMenu">
+            <div class="selector-option selected" onclick="setSite('Gurnee, IL')">Gurnee, IL <span class="role-tag">USA</span></div>
+            <div class="selector-option" onclick="setSite('Chicago, IL')">Chicago, IL <span class="role-tag">USA</span></div>
+            <div class="selector-option" onclick="setSite('Englewood, OH')">Englewood, OH <span class="role-tag">USA</span></div>
+            <div class="selector-option" onclick="setSite('Carnegie, PA')">Carnegie, PA <span class="role-tag">USA</span></div>
+            <div class="selector-option" onclick="setSite('Leuna, Germany')">Leuna, Germany <span class="role-tag">DE</span></div>
+          </div>
+        </div>
+
+        <div class="selector" id="userSelector">
+          <button class="user-chip" onclick="toggleMenu('userMenu')">
+            <div class="avatar" id="userAvatar">KH</div>
+            <div class="who">
+              <span id="currentUserName">Karen Hitchcock</span>
+              <span class="role" id="currentUserRole">EHSS Manager</span>
+            </div>
+            <span class="caret">▾</span>
+          </button>
+          <div class="selector-menu" id="userMenu" style="min-width:280px"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content" id="content"></div>
+  </div>
+</div>
+
+<!-- ============ NEW MOC MODAL ============ -->
+<div class="modal-bg" id="newMocModal">
+  <div class="modal">
+    <h3>Start a New MOC</h3>
+    <p>Select the type of change you want to manage. Use the MOC Hazard Assessment to determine the correct level.</p>
+    <div class="type-pick">
+      <div class="type-pick-opt" onclick="createMoc('L1')">
+        <div class="ico l1">L1</div>
+        <div>
+          <div class="label">Level 1 MOC</div>
+          <div class="desc">Low risk, low hazard change. Single-page approval with Process Safety + Relevant Manager.</div>
+        </div>
+      </div>
+      <div class="type-pick-opt" onclick="createMoc('L2')">
+        <div class="ico l2">L2</div>
+        <div>
+          <div class="label">Level 2 MOC (also for L3 / L4)</div>
+          <div class="desc">High significance or high hazard. Full approval chain — PM, TA, Maintenance, EHSS, Process Safety. PHA may be required.</div>
+        </div>
+      </div>
+      <div class="type-pick-opt" onclick="createMoc('MOOC')">
+        <div class="ico mooc">⛚</div>
+        <div>
+          <div class="label">Management of Organizational Change</div>
+          <div class="desc">Personnel change — resignation, transfer, or new assignment. Requires a transition plan and Site Manager approval.</div>
+        </div>
+      </div>
+      <div class="type-pick-opt" onclick="createMoc('BYPASS')">
+        <div class="ico bypass">!</div>
+        <div>
+          <div class="label">Safety System Bypass / Impairment</div>
+          <div class="desc">Temporary bypass of a safety device. Requires an alternate protection plan and daily verification log.</div>
+        </div>
+      </div>
+      <div class="type-pick-opt" onclick="createMoc('ADDENDUM')">
+        <div class="ico addendum">+</div>
+        <div>
+          <div class="label">MOC Addendum</div>
+          <div class="desc">Add a scope change to an existing approved MOC. Requires Technical Authority sign-off.</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('newMocModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ TOAST ============ -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   VANTAGE MOC — Application Logic
+   ============================================================ */
+
+// -------- USERS (role-based) --------
+const USERS = [
+  {id:'kh', name:'Karen Hitchcock', initials:'KH', role:'EHSS Manager', site:'Gurnee, IL'},
+  {id:'dr', name:'Domingo Reyes', initials:'DR', role:'Production Manager', site:'Gurnee, IL'},
+  {id:'tm', name:'Tony Martinez', initials:'TM', role:'Maintenance Manager', site:'Gurnee, IL'},
+  {id:'aa', name:'Aisha Adeyemi', initials:'AA', role:'Technical Authority', site:'Gurnee, IL'},
+  {id:'pe', name:'Priya Eswaran', initials:'PE', role:'Process Safety Engineer', site:'Gurnee, IL'},
+  {id:'js', name:'Jamal Sullivan', initials:'JS', role:'Site Manager', site:'Gurnee, IL'},
+  {id:'mw', name:'Marcus Webb', initials:'MW', role:'MOC Lead / Engineer', site:'Gurnee, IL'},
+  {id:'lh', name:'Lena Hoffmann', initials:'LH', role:'Plant Manager', site:'Leuna, Germany'}
+];
+
+const SITES = ['Gurnee, IL','Chicago, IL','Englewood, OH','Carnegie, PA','Leuna, Germany'];
+
+// -------- ROLE PERMISSIONS --------
+// Which roles can sign off on which slot
+const ROLE_PERMS = {
+  'Process Safety':['Process Safety Engineer','EHSS Manager'],
+  'Relevant Manager':['Production Manager','Maintenance Manager','Plant Manager'],
+  'Production Manager':['Production Manager','Plant Manager'],
+  'Technical Authority':['Technical Authority'],
+  'Maintenance Manager':['Maintenance Manager'],
+  'EHSS Manager':['EHSS Manager'],
+  'Site Manager':['Site Manager','Plant Manager'],
+  'MOC Lead':['MOC Lead / Engineer','Production Manager','Maintenance Manager','Technical Authority','Process Safety Engineer'],
+  'Approving Manager':['Production Manager','Maintenance Manager','Plant Manager','EHSS Manager','Site Manager']
+};
+
+// -------- WORKFLOW DEFINITIONS --------
+const WORKFLOWS = {
+  L1:[
+    {key:'draft',name:'Draft',role:'MOC Lead'},
+    {key:'review',name:'Functional Review',role:'Process Safety + Relevant Manager'},
+    {key:'implement',name:'Implementation',role:'MOC Lead'},
+    {key:'closeout',name:'Close Out',role:'Process Safety'},
+    {key:'closed',name:'Closed',role:''}
+  ],
+  L2:[
+    {key:'draft',name:'Draft / Scope',role:'MOC Lead'},
+    {key:'review',name:'Approval to Proceed',role:'PM, TA, Maint, EHSS, PS'},
+    {key:'implement',name:'Construction',role:'MOC Lead'},
+    {key:'handover',name:'Handover & Commissioning',role:'Production Manager'},
+    {key:'closeout',name:'Close Out',role:'MOC Lead + Process Safety'},
+    {key:'closed',name:'Closed',role:''}
+  ],
+  MOOC:[
+    {key:'draft',name:'Transition Plan',role:'MOOC Lead'},
+    {key:'review',name:'Final Approval',role:'Site Manager'},
+    {key:'implement',name:'Transition Active',role:'MOOC Lead'},
+    {key:'closeout',name:'Close Out',role:'MOOC Lead + PS'},
+    {key:'closed',name:'Closed',role:''}
+  ],
+  BYPASS:[
+    {key:'draft',name:'Bypass Request',role:'MOC Lead'},
+    {key:'review',name:'Manager Approval',role:'Approving Manager'},
+    {key:'implement',name:'Bypass Active',role:'MOC Lead — daily verify'},
+    {key:'closeout',name:'Restoration',role:'MOC Lead'},
+    {key:'closed',name:'Restored',role:''}
+  ],
+  ADDENDUM:[
+    {key:'draft',name:'Addendum Scope',role:'MOC Lead'},
+    {key:'review',name:'TA Review',role:'Technical Authority'},
+    {key:'closed',name:'Approved',role:''}
+  ]
+};
+
+const TYPE_LABEL = {L1:'Level 1',L2:'Level 2',MOOC:'MOOC',BYPASS:'Bypass',ADDENDUM:'Addendum'};
+
+// -------- STATE --------
+let state = {
+  currentSite:'Gurnee, IL',
+  currentUserId:'kh',
+  currentView:'dashboard',
+  activeMocId:null,
+  activeTab:null,
+  filterStatus:'all',
+  filterType:'all',
+  searchTerm:''
+};
+let mocs = [];
+
+// -------- DEMO DATA --------
+const DEMO_MOCS = [
+  {
+    id:'MOC-2026-0142', type:'L2', site:'Gurnee, IL',
+    title:'Replace Reactor R-301 Agitator Seal — Upgrade to Dual Mechanical',
+    asset:'R-301', plantArea:'Reactor Train 3', mocLead:'Marcus Webb',
+    status:'implement', wfStep:'implement',
+    created:'2026-04-22', startDate:'2026-05-01', endDate:'',
+    permanent:true,
+    summary:'Replace single mechanical seal on R-301 agitator with API-682 dual mechanical seal system, including new seal pot and instrumentation.',
+    techBasis:'Existing single seal has failed twice in 18 months with associated process material releases. Dual seal with buffer fluid and pressure monitoring provides containment redundancy and meets RMP Subpart D requirements.',
+    psi:'P&ID 301-A, Equipment File R-301, RV-301 sizing calc, Operating Procedure SOP-R301-02',
+    safetyEnvImpact:'Reduces risk of toluene release. New buffer fluid system requires SDS review and operator training. No new emissions.',
+    pha:'What If Review',
+    permanence:'permanent',
+    signoffs:{
+      'Production Manager':{name:'Domingo Reyes',date:'2026-04-25',status:'signed'},
+      'Technical Authority':{name:'Aisha Adeyemi',date:'2026-04-26',status:'signed'},
+      'Maintenance Manager':{name:'Tony Martinez',date:'2026-04-26',status:'signed'},
+      'EHSS Manager':{name:'Karen Hitchcock',date:'2026-04-27',status:'signed'},
+      'Process Safety':{name:'Priya Eswaran',date:'2026-04-27',status:'signed'}
+    },
+    activity:[
+      {user:'Marcus Webb',action:'created MOC',date:'2026-04-22 09:14'},
+      {user:'Marcus Webb',action:'submitted for approval',date:'2026-04-24 16:30'},
+      {user:'Priya Eswaran',action:'requested PHA — What If review',date:'2026-04-25 10:00'},
+      {user:'Domingo Reyes',action:'signed Production Manager approval',date:'2026-04-25 14:22'},
+      {user:'Karen Hitchcock',action:'signed EHSS Manager approval',date:'2026-04-27 08:45'},
+      {user:'System',action:'MOC moved to Implementation',date:'2026-04-27 09:00'}
+    ],
+    comments:[]
+  },
+  {
+    id:'MOC-2026-0156', type:'L1', site:'Gurnee, IL',
+    title:'Add Pressure Gauge to Caustic Day Tank T-204 Discharge',
+    asset:'T-204', plantArea:'Utility Area', mocLead:'Marcus Webb',
+    status:'review', wfStep:'review',
+    created:'2026-05-08', startDate:'2026-05-20', endDate:'',
+    permanent:true,
+    summary:'Install local pressure gauge (0-60 psig) on T-204 discharge line downstream of P-204A pump for troubleshooting and routine monitoring.',
+    techBasis:'Operators have no local indication of discharge pressure. Adding PI-204D provides leading indicator for pump performance and allows verification during startup.',
+    psi:'P&ID 204-B, Instrument list',
+    safetyEnvImpact:'No new hazards. Improves operator awareness. Standard 316L gauge with diaphragm seal compatible with 25% caustic.',
+    signoffs:{
+      'Process Safety':{name:'',date:'',status:'pending'},
+      'Relevant Manager':{name:'',date:'',status:'pending'}
+    },
+    activity:[
+      {user:'Marcus Webb',action:'created MOC',date:'2026-05-08 11:00'},
+      {user:'Marcus Webb',action:'submitted for functional review',date:'2026-05-10 15:42'}
+    ],
+    comments:[]
+  },
+  {
+    id:'MOC-2026-0149', type:'BYPASS', site:'Gurnee, IL',
+    title:'Bypass High-High Level Trip on Surge Tank V-110',
+    asset:'V-110', plantArea:'Distillation', mocLead:'Marcus Webb',
+    status:'implement', wfStep:'implement',
+    created:'2026-05-12', startDate:'2026-05-12', endDate:'2026-05-14',
+    bypassDevice:'LSHH-110 (High-High Level Switch, triggers feed pump trip)',
+    protectedEquipment:'V-110 Surge Tank — protects against overflow to drain header',
+    hazardExplanation:'Overflow could release ethyl acetate to plant drain, creating fire hazard and environmental release. PHA Item 4.3.2.',
+    bypassReason:'LSHH-110 failed in tripped state due to fouled probe. Plant down without bypass. Replacement probe arriving 5/14.',
+    altProtection:'Continuous operator presence at V-110 with manual sight glass check every 30 min. Backup high-level alarm LSH-110 still functional. Feed reduced to 60% rate.',
+    signoffs:{
+      'Approving Manager':{name:'Domingo Reyes',date:'2026-05-12',status:'signed'},
+      'MOC Lead':{name:'Marcus Webb',date:'2026-05-12',status:'signed'}
+    },
+    activity:[
+      {user:'Marcus Webb',action:'created bypass request',date:'2026-05-12 06:30'},
+      {user:'Domingo Reyes',action:'approved bypass (24 hr)',date:'2026-05-12 07:15'},
+      {user:'Operations',action:'logged 30-min verification check',date:'2026-05-13 14:00'}
+    ],
+    comments:[]
+  },
+  {
+    id:'MOOC-2026-0023', type:'MOOC', site:'Gurnee, IL',
+    title:'Transition — Process Safety Engineer Maternity Leave',
+    department:'EHS / Process Safety', moocLead:'Priya Eswaran',
+    jobTitle:'Process Safety Engineer',
+    status:'closed', wfStep:'closed',
+    created:'2026-02-10', startDate:'2026-04-01', endDate:'2026-09-01',
+    permanent:false,
+    jobDescription:'Process Safety Engineer responsible for PHA scheduling, MOC reviews, incident investigation lead, PSM compliance audits, and RMP reporting.',
+    signoffs:{
+      'MOOC Lead':{name:'Priya Eswaran',date:'2026-02-15',status:'signed'},
+      'Relevant Manager':{name:'Karen Hitchcock',date:'2026-02-16',status:'signed'},
+      'Site Manager':{name:'Jamal Sullivan',date:'2026-02-20',status:'signed'},
+      'Close-out: MOOC Lead':{name:'Priya Eswaran',date:'2026-03-28',status:'signed'},
+      'Close-out: Process Safety':{name:'Karen Hitchcock',date:'2026-03-30',status:'signed'}
+    },
+    activity:[
+      {user:'Priya Eswaran',action:'created MOOC',date:'2026-02-10 09:00'},
+      {user:'Karen Hitchcock',action:'reassigned PHA action items',date:'2026-03-15 10:00'},
+      {user:'Jamal Sullivan',action:'approved final transition plan',date:'2026-02-20 14:00'},
+      {user:'System',action:'MOOC closed',date:'2026-03-30 16:00'}
+    ],
+    comments:[]
+  },
+  {
+    id:'MOC-2026-0098', type:'L2', site:'Leuna, Germany',
+    title:'New Nitrogen Header Tie-in to Solvent Storage Area',
+    asset:'N2 Distribution', plantArea:'Tank Farm B', mocLead:'Lena Hoffmann',
+    status:'closed', wfStep:'closed',
+    created:'2026-01-15', startDate:'2026-02-12', endDate:'',
+    permanent:true,
+    summary:'Install 2" stainless steel nitrogen tie-in from main header to provide inerting capability for solvent tanks T-401 through T-405.',
+    techBasis:'ATEX Zone 1 area requires positive nitrogen blanket. Current manual tank-by-tank inerting is operationally complex and increases worker exposure during connection.',
+    psi:'P&ID 401-A, Area Classification Drawing, RV-401/402/403/404/405 sizing',
+    signoffs:{
+      'Production Manager':{name:'Lena Hoffmann',date:'2026-01-20',status:'signed'},
+      'Technical Authority':{name:'Aisha Adeyemi',date:'2026-01-22',status:'signed'},
+      'Maintenance Manager':{name:'Tony Martinez',date:'2026-01-22',status:'signed'},
+      'EHSS Manager':{name:'Karen Hitchcock',date:'2026-01-23',status:'signed'},
+      'Process Safety':{name:'Priya Eswaran',date:'2026-01-23',status:'signed'}
+    },
+    activity:[
+      {user:'Lena Hoffmann',action:'created MOC',date:'2026-01-15 09:00'},
+      {user:'System',action:'MOC closed after PSSR',date:'2026-02-28 14:00'}
+    ],
+    comments:[]
+  },
+  {
+    id:'MOC-2026-0167', type:'L1', site:'Chicago, IL',
+    title:'Update PM Frequency on P-501 Pumps from Quarterly to Monthly',
+    asset:'P-501A/B', plantArea:'Loading Rack', mocLead:'Marcus Webb',
+    status:'draft', wfStep:'draft',
+    created:'2026-05-13', startDate:'', endDate:'',
+    permanent:true,
+    summary:'Change preventative maintenance frequency on transfer pumps P-501A and P-501B from quarterly to monthly based on vibration trend data.',
+    signoffs:{
+      'Process Safety':{name:'',date:'',status:'pending'},
+      'Relevant Manager':{name:'',date:'',status:'pending'}
+    },
+    activity:[
+      {user:'Marcus Webb',action:'created MOC',date:'2026-05-13 14:30'}
+    ],
+    comments:[]
+  }
+];
+
+// -------- PERSISTENCE --------
+function loadState(){
+  try{
+    const raw = localStorage.getItem('vantage-moc-data');
+    if(raw){
+      mocs = JSON.parse(raw);
+    } else {
+      mocs = JSON.parse(JSON.stringify(DEMO_MOCS));
+      saveState();
+    }
+  }catch(e){mocs = JSON.parse(JSON.stringify(DEMO_MOCS))}
+}
+function saveState(){
+  try{localStorage.setItem('vantage-moc-data',JSON.stringify(mocs))}catch(e){}
+}
+
+// -------- HELPERS --------
+function $(s){return document.querySelector(s)}
+function currentUser(){return USERS.find(u=>u.id===state.currentUserId)}
+function toast(msg,type='success'){
+  const t = $('#toast');
+  t.className='toast '+type;
+  t.innerHTML = `<span class="ico">${type==='success'?'✓':type==='error'?'✕':'ⓘ'}</span> ${msg}`;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
+function fmtDate(d){
+  if(!d) return '—';
+  const dt = new Date(d);
+  if(isNaN(dt)) return d;
+  return dt.toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'});
+}
+function nowStamp(){
+  const d = new Date();
+  return d.toISOString().slice(0,16).replace('T',' ');
+}
+function todayStr(){return new Date().toISOString().slice(0,10)}
+function nextMocId(type){
+  const prefix = type==='MOOC'?'MOOC':'MOC';
+  const year = new Date().getFullYear();
+  const used = mocs.map(m=>{
+    const match = m.id.match(/-(\d+)$/);
+    return match?parseInt(match[1]):0;
+  });
+  const next = Math.max(0,...used)+1;
+  return `${prefix}-${year}-${String(next).padStart(4,'0')}`;
+}
+function canSignOff(slot){
+  const u = currentUser();
+  const allowed = ROLE_PERMS[slot] || [];
+  return allowed.includes(u.role);
+}
+function pendingForUser(){
+  return mocs.filter(m=>{
+    if(!m.signoffs) return false;
+    return Object.entries(m.signoffs).some(([slot,so])=>so.status==='pending' && canSignOff(slot));
+  });
+}
+function statusLabel(s){
+  return {draft:'Draft',review:'In Review',approved:'Approved',implement:'Implementation',handover:'Commissioning',closeout:'Close-out',closed:'Closed',rejected:'Rejected'}[s]||s;
+}
+
+function toggleMenu(id){
+  document.querySelectorAll('.selector-menu').forEach(m=>{if(m.id!==id)m.classList.remove('open')});
+  document.getElementById(id).classList.toggle('open');
+}
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.selector')){
+    document.querySelectorAll('.selector-menu').forEach(m=>m.classList.remove('open'));
+  }
+});
+
+function setSite(site){
+  state.currentSite = site;
+  $('#currentSite').textContent = site;
+  document.querySelectorAll('#siteMenu .selector-option').forEach(o=>{
+    o.classList.toggle('selected',o.textContent.trim().startsWith(site));
+  });
+  toggleMenu('siteMenu');
+  render();
+}
+
+function setUser(id){
+  state.currentUserId = id;
+  const u = currentUser();
+  $('#currentUserName').textContent = u.name;
+  $('#currentUserRole').textContent = u.role;
+  $('#userAvatar').textContent = u.initials;
+  buildUserMenu();
+  toggleMenu('userMenu');
+  render();
+}
+
+function buildUserMenu(){
+  const menu = $('#userMenu');
+  menu.innerHTML = `<div style="padding:8px 12px 4px;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--grey-med);font-weight:600">Switch User (Demo)</div>` +
+    USERS.map(u=>`
+      <div class="selector-option ${u.id===state.currentUserId?'selected':''}" onclick="setUser('${u.id}')">
+        <div class="avatar" style="width:26px;height:26px;font-size:10px">${u.initials}</div>
+        <div>
+          <div style="font-weight:600;font-size:13px;line-height:1.1">${u.name}</div>
+          <div style="font-size:11px;color:var(--grey-med);margin-top:2px">${u.role}</div>
+        </div>
+      </div>
+    `).join('');
+}
+
+function openModal(id){$('#'+id).classList.add('open')}
+function closeModal(id){$('#'+id).classList.remove('open')}
+
+/* ============================================================
+   RENDER ROUTER
+   ============================================================ */
+function render(){
+  // Update sidebar counts
+  $('#navTotal').textContent = mocs.filter(m=>m.site===state.currentSite).length;
+  $('#navTasks').textContent = pendingForUser().length;
+
+  // Update active nav
+  document.querySelectorAll('.nav-item').forEach(n=>{
+    n.classList.toggle('active', n.dataset.view===state.currentView);
+  });
+
+  if(state.activeMocId){
+    renderMocDetail();
+    return;
+  }
+  if(state.currentView==='dashboard') renderDashboard();
+  else if(state.currentView==='register') renderRegister();
+  else if(state.currentView==='my-tasks') renderMyTasks();
+  else if(state.currentView==='bypass-log') renderBypassLog();
+  else if(state.currentView==='reports') renderReports();
+  else if(state.currentView==='settings') renderSettings();
+  else if(state.currentView==='help') renderHelp();
+}
+
+/* ============================================================
+   DASHBOARD
+   ============================================================ */
+function renderDashboard(){
+  const siteMocs = mocs.filter(m=>m.site===state.currentSite);
+  const counts = {
+    draft:siteMocs.filter(m=>m.status==='draft').length,
+    review:siteMocs.filter(m=>m.status==='review').length,
+    implement:siteMocs.filter(m=>['implement','handover','closeout'].includes(m.status)).length,
+    closed:siteMocs.filter(m=>m.status==='closed').length
+  };
+  const recent = [...siteMocs].sort((a,b)=>b.created.localeCompare(a.created)).slice(0,5);
+  const myPending = pendingForUser().filter(m=>m.site===state.currentSite).slice(0,5);
+
+  $('#content').innerHTML = `
+    <div class="page-head">
+      <div>
+        <div class="page-title">Dashboard</div>
+        <div class="page-sub">Management of Change overview — ${state.currentSite}</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-secondary" onclick="exportAll()">↓ Export Register</button>
+        <button class="btn btn-primary" onclick="openModal('newMocModal')">+ New MOC</button>
+      </div>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat draft">
+        <div class="stat-icon">✎</div>
+        <div class="stat-label">Draft</div>
+        <div class="stat-value">${counts.draft}</div>
+        <div class="stat-trend">awaiting submission</div>
+      </div>
+      <div class="stat review">
+        <div class="stat-icon">⧗</div>
+        <div class="stat-label">In Review</div>
+        <div class="stat-value">${counts.review}</div>
+        <div class="stat-trend" style="color:#c45619">${myPending.length} need your action</div>
+      </div>
+      <div class="stat implement">
+        <div class="stat-icon">⚙</div>
+        <div class="stat-label">Active</div>
+        <div class="stat-value">${counts.implement}</div>
+        <div class="stat-trend" style="color:#a87311">implementation / closeout</div>
+      </div>
+      <div class="stat closed">
+        <div class="stat-icon">✓</div>
+        <div class="stat-label">Closed YTD</div>
+        <div class="stat-value">${counts.closed}</div>
+        <div class="stat-trend">complete</div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px">
+      <div class="card">
+        <div class="card-head"><div class="card-title">⚡ My Pending Approvals</div><div class="pill ${myPending.length?'warn':''}">${myPending.length}</div></div>
+        ${myPending.length===0
+          ?`<div class="empty" style="padding:30px 20px"><div class="ico">✓</div><h4>You're all caught up</h4><p>No MOCs are currently waiting for your sign-off.</p></div>`
+          :`<table><tbody>${myPending.map(m=>`
+            <tr class="row-link" onclick="openMoc('${m.id}')">
+              <td><div class="moc-id">${m.id}</div></td>
+              <td><div class="moc-title">${m.title}</div></td>
+              <td><span class="type-pill type-${m.type}">${TYPE_LABEL[m.type]}</span></td>
+            </tr>`).join('')}</tbody></table>`}
+      </div>
+
+      <div class="card">
+        <div class="card-head"><div class="card-title">📊 Recent Activity</div></div>
+        ${recent.length===0
+          ?`<div class="empty" style="padding:30px 20px"><div class="ico">○</div><h4>No MOCs yet</h4><p>Click "New MOC" to start.</p></div>`
+          :`<table><tbody>${recent.map(m=>`
+            <tr class="row-link" onclick="openMoc('${m.id}')">
+              <td><div class="moc-id">${m.id}</div></td>
+              <td><div class="moc-title">${m.title}</div></td>
+              <td><span class="status status-${m.status}"><span class="dot"></span>${statusLabel(m.status)}</span></td>
+            </tr>`).join('')}</tbody></table>`}
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title">MOC Register — ${state.currentSite}</div>
+        <button class="btn btn-secondary btn-sm" onclick="state.currentView='register';state.activeMocId=null;render()">View all →</button>
+      </div>
+      ${renderTable(siteMocs.slice(0,8))}
+    </div>
+  `;
+}
+
+/* ============================================================
+   REGISTER
+   ============================================================ */
+function renderRegister(){
+  const filterChips = ['all','draft','review','implement','closeout','closed'];
+  let filtered = mocs.filter(m=>m.site===state.currentSite);
+  if(state.filterStatus!=='all') filtered = filtered.filter(m=>m.status===state.filterStatus);
+  if(state.filterType!=='all') filtered = filtered.filter(m=>m.type===state.filterType);
+  if(state.searchTerm){
+    const q = state.searchTerm.toLowerCase();
+    filtered = filtered.filter(m=>(m.id+' '+m.title+' '+(m.mocLead||m.moocLead||'')).toLowerCase().includes(q));
+  }
+
+  $('#content').innerHTML = `
+    <div class="page-head">
+      <div>
+        <div class="page-title">MOC Register</div>
+        <div class="page-sub">All Management of Change records for ${state.currentSite}</div>
+      </div>
+      <button class="btn btn-primary" onclick="openModal('newMocModal')">+ New MOC</button>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div class="filters">
+          ${filterChips.map(s=>`<div class="filter-chip ${state.filterStatus===s?'active':''}" onclick="state.filterStatus='${s}';render()">${s==='all'?'All Status':statusLabel(s)}</div>`).join('')}
+        </div>
+        <div class="filters">
+          ${['all','L1','L2','MOOC','BYPASS','ADDENDUM'].map(t=>`<div class="filter-chip ${state.filterType===t?'active':''}" onclick="state.filterType='${t}';render()">${t==='all'?'All Types':TYPE_LABEL[t]}</div>`).join('')}
+        </div>
+      </div>
+      ${renderTable(filtered)}
+    </div>
+  `;
+}
+
+function renderTable(list){
+  if(list.length===0){
+    return `<div class="empty"><div class="ico">○</div><h4>No MOCs match</h4><p>Try adjusting filters or create a new MOC.</p></div>`;
+  }
+  return `
+    <table>
+      <thead>
+        <tr>
+          <th>MOC ID</th>
+          <th>Title</th>
+          <th>Type</th>
+          <th>Owner</th>
+          <th>Status</th>
+          <th>Created</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        ${list.map(m=>`
+          <tr class="row-link" onclick="openMoc('${m.id}')">
+            <td><div class="moc-id">${m.id}</div></td>
+            <td><div class="moc-title">${m.title}</div></td>
+            <td><span class="type-pill type-${m.type}">${TYPE_LABEL[m.type]}</span></td>
+            <td>${m.mocLead||m.moocLead||'—'}</td>
+            <td><span class="status status-${m.status}"><span class="dot"></span>${statusLabel(m.status)}</span></td>
+            <td style="color:var(--grey-med)">${fmtDate(m.created)}</td>
+            <td><span style="color:var(--grey-med)">→</span></td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+/* ============================================================
+   MY TASKS
+   ============================================================ */
+function renderMyTasks(){
+  const tasks = pendingForUser();
+  $('#content').innerHTML = `
+    <div class="page-head">
+      <div>
+        <div class="page-title">My Approvals</div>
+        <div class="page-sub">MOCs waiting for your sign-off as ${currentUser().role}</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><div class="card-title">${tasks.length} pending</div></div>
+      ${tasks.length===0
+        ?`<div class="empty"><div class="ico">✓</div><h4>Nothing to approve</h4><p>You have no pending sign-offs at this time.</p></div>`
+        :renderTable(tasks)}
+    </div>
+  `;
+}
+
+/* ============================================================
+   BYPASS LOG
+   ============================================================ */
+function renderBypassLog(){
+  const bypasses = mocs.filter(m=>m.type==='BYPASS' && m.site===state.currentSite);
+  $('#content').innerHTML = `
+    <div class="page-head">
+      <div>
+        <div class="page-title">Safety System Bypass Log</div>
+        <div class="page-sub">Active and historical bypasses — ${state.currentSite}</div>
+      </div>
+      <button class="btn btn-primary" onclick="createMoc('BYPASS')">+ New Bypass</button>
+    </div>
+    <div class="info-banner warn">
+      <span class="ico">⚠</span>
+      <div><strong>Reminder:</strong> Bypasses over 72 hours require additional approval from Production Manager, Technical Authority, and EHSS Manager. Daily verification of alternate protection must be logged.</div>
+    </div>
+    <div class="card">${bypasses.length?renderTable(bypasses):`<div class="empty"><div class="ico">○</div><h4>No active bypasses</h4></div>`}</div>
+  `;
+}
+
+/* ============================================================
+   REPORTS
+   ============================================================ */
+function renderReports(){
+  const siteMocs = mocs.filter(m=>m.site===state.currentSite);
+  const byType = {};
+  siteMocs.forEach(m=>{byType[m.type]=(byType[m.type]||0)+1});
+
+  $('#content').innerHTML = `
+    <div class="page-head">
+      <div>
+        <div class="page-title">Reports</div>
+        <div class="page-sub">MOC metrics for ${state.currentSite}</div>
+      </div>
+      <button class="btn btn-secondary" onclick="exportAll()">↓ Export to CSV</button>
+    </div>
+
+    <div class="stat-grid">
+      ${Object.entries(byType).map(([t,c])=>`
+        <div class="stat closed">
+          <div class="stat-label">${TYPE_LABEL[t]||t}</div>
+          <div class="stat-value">${c}</div>
+          <div class="stat-trend">total records</div>
+        </div>
+      `).join('')}
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div class="card-title">Cycle Time by Type</div></div>
+      <div style="padding:24px">
+        ${['L1','L2','MOOC','BYPASS'].map(t=>{
+          const items = siteMocs.filter(m=>m.type===t && m.status==='closed');
+          const avgDays = items.length?Math.round(items.reduce((s,m)=>{
+            const d = (new Date(m.activity[m.activity.length-1]?.date.split(' ')[0]||m.created) - new Date(m.created))/(1000*60*60*24);
+            return s+d;
+          },0)/items.length):0;
+          const pct = Math.min(100,avgDays*2);
+          return `
+            <div style="margin-bottom:16px">
+              <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span><strong>${TYPE_LABEL[t]}</strong> <span style="color:var(--grey-med)">(${items.length} closed)</span></span><span>${avgDays} days avg</span></div>
+              <div style="height:8px;background:var(--grey-light);border-radius:4px;overflow:hidden"><div style="height:100%;width:${pct}%;background:linear-gradient(90deg,var(--green-primary),var(--green-medium));border-radius:4px"></div></div>
+            </div>`;
+        }).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function renderSettings(){
+  $('#content').innerHTML = `
+    <div class="page-head"><div><div class="page-title">Settings</div><div class="page-sub">System configuration</div></div></div>
+    <div class="card" style="padding:24px">
+      <div class="section-title"><div class="bar"></div>Demo Data</div>
+      <p style="font-size:13px;color:var(--grey-text);margin-bottom:14px">This demo stores MOC data in your browser's local storage. Use the buttons below to manage demo data.</p>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-secondary" onclick="if(confirm('Reset to demo data? This will replace all current MOCs.')){localStorage.removeItem('vantage-moc-data');loadState();render();toast('Demo data reloaded')}">↻ Reset to Demo Data</button>
+        <button class="btn btn-danger" onclick="if(confirm('Delete ALL MOCs? This cannot be undone.')){mocs=[];saveState();render();toast('All MOCs deleted','error')}">⌫ Clear All MOCs</button>
+      </div>
+      <div class="section-title"><div class="bar"></div>Sites Configured</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">${SITES.map(s=>`<span class="pill info">${s}</span>`).join('')}</div>
+      <div class="section-title"><div class="bar"></div>Users & Roles (Demo)</div>
+      <table style="margin-top:8px"><thead><tr><th>Name</th><th>Role</th><th>Site</th></tr></thead><tbody>
+        ${USERS.map(u=>`<tr><td><div style="display:flex;align-items:center;gap:10px"><div class="avatar" style="width:28px;height:28px;font-size:11px">${u.initials}</div>${u.name}</div></td><td><span class="pill">${u.role}</span></td><td style="color:var(--grey-med)">${u.site}</td></tr>`).join('')}
+      </tbody></table>
+    </div>
+  `;
+}
+
+function renderHelp(){
+  $('#content').innerHTML = `
+    <div class="page-head"><div><div class="page-title">Help & Reference</div><div class="page-sub">MOC procedure guidance</div></div></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+      <div class="card" style="padding:24px">
+        <div class="section-title"><div class="bar"></div>When do I need a MOC?</div>
+        <p style="font-size:13.5px;line-height:1.7;color:var(--grey-text)">A MOC is required for any change that is <strong>not a replacement in kind</strong> (not "like-for-like"). This includes equipment changes, procedure changes, personnel changes, and temporary bypasses.</p>
+
+        <div class="section-title"><div class="bar"></div>MOC Levels</div>
+        <table style="margin-top:8px">
+          <thead><tr><th>Risk</th><th>Low Significance</th><th>High Significance</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Low Hazard</strong></td><td><span class="type-pill type-L1">Level 1</span></td><td><span class="type-pill type-L2">Level 2</span></td></tr>
+            <tr><td><strong>High Hazard</strong></td><td>Level 3 (use L2 form + What If PHA)</td><td>Level 4 (use L2 form + HAZOP)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card" style="padding:24px">
+        <div class="section-title"><div class="bar"></div>Form Selection</div>
+        <details open><summary>Safety System Bypass</summary><div style="font-size:13px;color:var(--grey-text);line-height:1.6">Use for temporary disabling of a safety device. Requires alternate protection plan and daily verification log. >72hr requires extension approval.</div></details>
+        <details><summary>Level 1 MOC</summary><div style="font-size:13px;color:var(--grey-text);line-height:1.6">Low-risk, low-hazard changes. Approval from Process Safety and Relevant Manager. PSSR may or may not be required.</div></details>
+        <details><summary>Level 2 MOC (also for L3 & L4)</summary><div style="font-size:13px;color:var(--grey-text);line-height:1.6">Higher significance/hazard changes. Full approval chain including PM, TA, Maintenance, EHSS, and Process Safety. Includes Safety & Environmental Assessment and documentation checklist.</div></details>
+        <details><summary>MOOC — Organizational</summary><div style="font-size:13px;color:var(--grey-text);line-height:1.6">Personnel transitions (resignations, transfers, leaves). Requires transition plan reassigning responsibilities across PSM elements.</div></details>
+        <details><summary>Addendum</summary><div style="font-size:13px;color:var(--grey-text);line-height:1.6">Scope addition to an existing approved MOC. Requires Technical Authority sign-off only.</div></details>
+      </div>
+    </div>
+  `;
+}
+
+/* ============================================================
+   CREATE NEW MOC
+   ============================================================ */
+function createMoc(type){
+  closeModal('newMocModal');
+  const u = currentUser();
+  const id = nextMocId(type);
+  const signoffs = {};
+
+  if(type==='L1'){
+    signoffs['Process Safety']={name:'',date:'',status:'pending'};
+    signoffs['Relevant Manager']={name:'',date:'',status:'pending'};
+  } else if(type==='L2'){
+    signoffs['Production Manager']={name:'',date:'',status:'pending'};
+    signoffs['Technical Authority']={name:'',date:'',status:'pending'};
+    signoffs['Maintenance Manager']={name:'',date:'',status:'pending'};
+    signoffs['EHSS Manager']={name:'',date:'',status:'pending'};
+    signoffs['Process Safety']={name:'',date:'',status:'pending'};
+  } else if(type==='MOOC'){
+    signoffs['MOOC Lead']={name:'',date:'',status:'pending'};
+    signoffs['Relevant Manager']={name:'',date:'',status:'pending'};
+    signoffs['Site Manager']={name:'',date:'',status:'pending'};
+  } else if(type==='BYPASS'){
+    signoffs['Approving Manager']={name:'',date:'',status:'pending'};
+    signoffs['MOC Lead']={name:'',date:'',status:'pending'};
+  } else if(type==='ADDENDUM'){
+    signoffs['Technical Authority']={name:'',date:'',status:'pending'};
+  }
+
+  const newMoc = {
+    id, type, site:state.currentSite,
+    title:'(Untitled '+TYPE_LABEL[type]+')',
+    asset:'', plantArea:'',
+    mocLead:type==='MOOC'?'':u.name,
+    moocLead:type==='MOOC'?u.name:'',
+    status:'draft', wfStep:'draft',
+    created:todayStr(),
+    startDate:'', endDate:'',
+    permanent:true,
+    summary:'', techBasis:'', psi:'',
+    safetyEnvImpact:'',
+    signoffs,
+    checklist:{},
+    safetyChecks:{},
+    docsChecklist:{},
+    activity:[{user:u.name,action:`created new ${TYPE_LABEL[type]} MOC`,date:nowStamp()}],
+    comments:[]
+  };
+  mocs.unshift(newMoc);
+  saveState();
+  state.activeMocId = id;
+  state.activeTab = null;
+  toast(`Created ${id}`);
+  render();
+}
+
+/* ============================================================
+   MOC DETAIL VIEW
+   ============================================================ */
+function openMoc(id){
+  state.activeMocId = id;
+  state.activeTab = null;
+  render();
+}
+function backToList(){
+  state.activeMocId = null;
+  state.activeTab = null;
+  render();
+}
+
+function renderMocDetail(){
+  const m = mocs.find(x=>x.id===state.activeMocId);
+  if(!m){backToList();return}
+
+  const wf = WORKFLOWS[m.type];
+  const stepIdx = wf.findIndex(s=>s.key===m.wfStep);
+
+  const tabs = {
+    L1:['Scope','Functional Review','Sign-offs','Close-out','Documents'],
+    L2:['Scope','Safety Assessment','Approvals','Implementation','Close-out','Documents'],
+    MOOC:['Scope & Transition','Approvals','Reassignment Checklist','Close-out'],
+    BYPASS:['Bypass Details','Approvals','Daily Log','Restoration'],
+    ADDENDUM:['Scope','Sign-off']
+  }[m.type];
+
+  if(!state.activeTab) state.activeTab = tabs[0];
+
+  $('#content').innerHTML = `
+    <div class="breadcrumb"><span onclick="backToList()">MOC Register</span><span class="sep">›</span><span>${m.id}</span></div>
+
+    <div class="print-header">
+      <div>
+        <div style="font-size:18px;font-weight:700;color:var(--green-dark)">Vantage® Management of Change</div>
+        <div style="font-size:11px;color:var(--grey-med);text-transform:uppercase;letter-spacing:1px">${m.site} — ${TYPE_LABEL[m.type]} Form</div>
+      </div>
+      <div style="text-align:right;font-size:11px;color:var(--grey-med)">
+        Printed ${new Date().toLocaleString()}<br>
+        Document: ${m.id}
+      </div>
+    </div>
+
+    <div class="detail-head">
+      <div class="detail-head-row">
+        <div style="flex:1;min-width:300px">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap">
+            <span class="moc-id" style="font-size:14px">${m.id}</span>
+            <span class="type-pill type-${m.type}">${TYPE_LABEL[m.type]}</span>
+            <span class="status status-${m.status}"><span class="dot"></span>${statusLabel(m.status)}</span>
+          </div>
+          <h2>${m.title}</h2>
+          <div class="detail-meta">
+            <span><strong>Site:</strong> ${m.site}</span>
+            <span><strong>Owner:</strong> ${m.mocLead||m.moocLead||'—'}</span>
+            <span><strong>Created:</strong> ${fmtDate(m.created)}</span>
+            ${m.startDate?`<span><strong>Start:</strong> ${fmtDate(m.startDate)}</span>`:''}
+            ${m.endDate?`<span><strong>End:</strong> ${fmtDate(m.endDate)}</span>`:''}
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-secondary btn-sm" onclick="printMoc()">🖨 Print / PDF</button>
+          ${m.status==='draft'?`<button class="btn btn-primary btn-sm" onclick="submitForReview('${m.id}')">Submit for Review →</button>`:''}
+          ${m.status==='review' && allSigned(m)?`<button class="btn btn-primary btn-sm" onclick="advanceWorkflow('${m.id}')">Advance to Implementation →</button>`:''}
+          ${m.status==='implement'?`<button class="btn btn-primary btn-sm" onclick="advanceToCloseout('${m.id}')">Mark Implementation Complete →</button>`:''}
+          ${m.status==='closeout'?`<button class="btn btn-primary btn-sm" onclick="closeMoc('${m.id}')">Close MOC ✓</button>`:''}
+        </div>
+      </div>
+
+      <div class="workflow">
+        ${wf.map((s,i)=>`
+          <div class="wf-step ${i<stepIdx?'done':i===stepIdx?'active':''}">
+            <div class="dot">${i<stepIdx?'✓':i+1}</div>
+            ${s.name}
+            <div style="font-weight:400;color:var(--grey-med);font-size:10px;margin-top:2px">${s.role}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="moc-detail">
+      <div>
+        <div class="tabs">
+          ${tabs.map(t=>`<div class="tab ${t===state.activeTab?'active':''}" onclick="state.activeTab='${t}';render()">${t}</div>`).join('')}
+        </div>
+        <div class="tab-content">${renderTab(m)}</div>
+
+        <div class="all-tabs-print" style="display:none">
+          ${tabs.map(t=>`<div data-tab-name="${t}">${renderTabForType(m,t)}</div>`).join('')}
+        </div>
+
+        <div class="action-bar">
+          <div class="action-bar-info">Auto-saved · Last activity ${m.activity[m.activity.length-1]?.date||'—'}</div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-ghost" onclick="backToList()">← Back to register</button>
+            <button class="btn btn-secondary" onclick="saveCurrentMoc('${m.id}')">💾 Save</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="rail">
+        <div class="rail-card">
+          <h3>Activity Log</h3>
+          ${m.activity.slice().reverse().slice(0,8).map(a=>{
+            const usr = USERS.find(u=>u.name===a.user);
+            const init = usr?usr.initials:(a.user||'??').split(' ').map(w=>w[0]).join('').slice(0,2);
+            return `
+              <div class="activity-item">
+                <div class="activity-dot">${init}</div>
+                <div class="activity-body">
+                  <div><strong>${a.user}</strong> ${a.action}</div>
+                  <div class="activity-meta">${a.date}</div>
+                </div>
+              </div>`;
+          }).join('')}
+        </div>
+
+        <div class="rail-card">
+          <h3>Comments</h3>
+          ${m.comments.length===0?`<div style="font-size:12px;color:var(--grey-med);padding:8px 0">No comments yet.</div>`:m.comments.map(c=>`
+            <div class="activity-item">
+              <div class="activity-dot">${(c.user||'??').split(' ').map(w=>w[0]).join('').slice(0,2)}</div>
+              <div class="activity-body"><div><strong>${c.user}</strong></div><div style="margin-top:2px">${c.text}</div><div class="activity-meta">${c.date}</div></div>
+            </div>`).join('')}
+          <div class="comment-box">
+            <textarea id="commentInput" placeholder="Add a comment..."></textarea>
+          </div>
+          <button class="btn btn-secondary btn-sm" style="margin-top:8px;width:100%" onclick="addComment('${m.id}')">Post Comment</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderTab(m){return renderTabForType(m,state.activeTab)}
+
+function renderTabForType(m, tab){
+  if(m.type==='L1'){
+    if(tab==='Scope') return renderL1Scope(m);
+    if(tab==='Functional Review') return renderL1Functional(m);
+    if(tab==='Sign-offs') return renderSignoffs(m);
+    if(tab==='Close-out') return renderL1CloseOut(m);
+    if(tab==='Documents') return renderDocsTab(m);
+  }
+  if(m.type==='L2'){
+    if(tab==='Scope') return renderL2Scope(m);
+    if(tab==='Safety Assessment') return renderL2Safety(m);
+    if(tab==='Approvals') return renderSignoffs(m);
+    if(tab==='Implementation') return renderL2Implementation(m);
+    if(tab==='Close-out') return renderL2CloseOut(m);
+    if(tab==='Documents') return renderL2Docs(m);
+  }
+  if(m.type==='MOOC'){
+    if(tab==='Scope & Transition') return renderMOOCScope(m);
+    if(tab==='Approvals') return renderSignoffs(m);
+    if(tab==='Reassignment Checklist') return renderMOOCChecklist(m);
+    if(tab==='Close-out') return renderMOOCCloseout(m);
+  }
+  if(m.type==='BYPASS'){
+    if(tab==='Bypass Details') return renderBypassDetails(m);
+    if(tab==='Approvals') return renderSignoffs(m);
+    if(tab==='Daily Log') return renderBypassLogTab(m);
+    if(tab==='Restoration') return renderBypassRestoration(m);
+  }
+  if(m.type==='ADDENDUM'){
+    if(tab==='Scope') return renderAddendumScope(m);
+    if(tab==='Sign-off') return renderSignoffs(m);
+  }
+  return '<p>—</p>';
+}
+
+/* ---------- Level 1 ---------- */
+function renderL1Scope(m){
+  return `
+    <div class="section-title"><div class="bar"></div>Part 1A — Scope of MOC</div>
+    <div class="field-row cols-2">
+      <div><label>MOC Title <span class="req">*</span></label><input type="text" value="${escAttr(m.title)}" onchange="updMoc('${m.id}','title',this.value)"></div>
+      <div><label>Asset</label><input type="text" value="${escAttr(m.asset||'')}" onchange="updMoc('${m.id}','asset',this.value)" placeholder="e.g. R-301"></div>
+    </div>
+    <div class="field-row cols-2">
+      <div><label>Plant Area</label><input type="text" value="${escAttr(m.plantArea||'')}" onchange="updMoc('${m.id}','plantArea',this.value)"></div>
+      <div><label>MOC Lead</label><input type="text" value="${escAttr(m.mocLead||'')}" onchange="updMoc('${m.id}','mocLead',this.value)"></div>
+    </div>
+    <div class="field-group">
+      <label>Brief Summary of Asset Managed Modification <span class="req">*</span></label>
+      <textarea onchange="updMoc('${m.id}','summary',this.value)" placeholder="What is being changed?">${escTxt(m.summary||'')}</textarea>
+    </div>
+    <div class="field-group">
+      <label>Technical Basis for Change <span class="req">*</span></label>
+      <textarea onchange="updMoc('${m.id}','techBasis',this.value)" placeholder="What will be achieved? How will the change achieve the intended goal? Is the change safe to make and why?">${escTxt(m.techBasis||'')}</textarea>
+    </div>
+    <div class="field-group">
+      <label>Process Safety Information to Update</label>
+      <textarea onchange="updMoc('${m.id}','psi',this.value)" placeholder="P&IDs, SOPs, RV calcs, equipment files, etc.">${escTxt(m.psi||'')}</textarea>
+    </div>
+
+    <div class="section-title"><div class="bar"></div>Permanence & Duration</div>
+    <div class="field-row cols-3">
+      <div>
+        <label>Type</label>
+        <div class="radio-group">
+          <label class="radio-opt"><input type="radio" name="perm-${m.id}" ${m.permanent?'checked':''} onchange="updMoc('${m.id}','permanent',true)"> Permanent</label>
+          <label class="radio-opt"><input type="radio" name="perm-${m.id}" ${!m.permanent?'checked':''} onchange="updMoc('${m.id}','permanent',false)"> Temporary</label>
+        </div>
+      </div>
+      <div><label>Start Date</label><input type="date" value="${m.startDate||''}" onchange="updMoc('${m.id}','startDate',this.value)"></div>
+      <div><label>End Date ${m.permanent?'':'<span class="req">*</span>'}</label><input type="date" value="${m.endDate||''}" onchange="updMoc('${m.id}','endDate',this.value)"></div>
+    </div>
+
+    <div class="section-title"><div class="bar"></div>Part 1B — Impact on Safety and Environment</div>
+    <div class="field-group">
+      <label>Assessment</label>
+      <textarea onchange="updMoc('${m.id}','safetyEnvImpact',this.value)" placeholder="Describe the impact of this change on Safety and Environment">${escTxt(m.safetyEnvImpact||'')}</textarea>
+    </div>
+  `;
+}
+
+const FUNCTIONAL_REVIEW_ITEMS = [
+  'Does the change involve material upgrade? Has it been reviewed by relevant engineer',
+  'Does the change involve machinery? Technical change basis reviewed by relevant engineer?',
+  'Have hazards been considered & documented (deviations in flow, pressure, temperature)?',
+  'Have inspection requirements been reviewed by relevant engineer?',
+  'Is welding design/procedure in accordance with code requirements?',
+  'Has the design included gusseting small piping connections as needed?',
+  'Is there adequate working space for field work?',
+  'Would any additional lighting be required to operate the change?',
+  'Will execution be under direct supervision of experienced Vantage personnel?',
+  'Is there a fire hazard during field work?',
+  'Have adequate measures been taken if area not covered by existing fire water?',
+  'Will closeout of change be required?',
+  'PSSR required (input from Process Safety Engineer)?'
+];
+
+function renderL1Functional(m){
+  if(!m.checklist) m.checklist = {};
+  return `
+    <div class="info-banner"><span class="ico">ⓘ</span><div>Functional Review Checklist — Process Safety & Competent Person to review before signoff (Appendix A of Level 1 form).</div></div>
+    <table class="checklist-table">
+      <thead><tr><th>Design / Engineering Item</th><th class="yn-cell">Yes</th><th class="yn-cell">No</th><th class="yn-cell">N/A</th><th>Remarks</th></tr></thead>
+      <tbody>
+        ${FUNCTIONAL_REVIEW_ITEMS.map((item,i)=>{
+          const c = m.checklist['fr'+i] || {ans:'',remark:''};
+          return `
+            <tr>
+              <td style="font-size:12.5px">${item}</td>
+              <td class="yn-cell"><input type="radio" name="fr-${m.id}-${i}" ${c.ans==='y'?'checked':''} onchange="updCheck('${m.id}','fr${i}','ans','y')"></td>
+              <td class="yn-cell"><input type="radio" name="fr-${m.id}-${i}" ${c.ans==='n'?'checked':''} onchange="updCheck('${m.id}','fr${i}','ans','n')"></td>
+              <td class="yn-cell"><input type="radio" name="fr-${m.id}-${i}" ${c.ans==='na'?'checked':''} onchange="updCheck('${m.id}','fr${i}','ans','na')"></td>
+              <td><input type="text" value="${escAttr(c.remark||'')}" onchange="updCheck('${m.id}','fr${i}','remark',this.value)" placeholder="—"></td>
+            </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+const L1_CLOSEOUT_ITEMS = [
+  ['Job completed?','jobDone'],
+  ['PSSR completed?','pssrDone'],
+  ['PSI & Equipment File updated?','psiUpdated'],
+  ['Add / Modify / Delete Form Submitted & Installed?','amdForm'],
+  ['All punch list recommendations closed?','punchList'],
+  ['LDAR updated?','ldar']
+];
+
+function renderL1CloseOut(m){
+  if(!m.closeout) m.closeout = {};
+  return `
+    <div class="section-title"><div class="bar"></div>Part 2 — Post-Commissioning & Close Out</div>
+    <table class="checklist-table">
+      <thead><tr><th>Item</th><th class="yn-cell">Yes</th><th class="yn-cell">N/A</th></tr></thead>
+      <tbody>
+        ${L1_CLOSEOUT_ITEMS.map(([label,key])=>`
+          <tr>
+            <td><strong>${label}</strong></td>
+            <td class="yn-cell"><input type="radio" name="co-${m.id}-${key}" ${m.closeout[key]==='y'?'checked':''} onchange="updCloseout('${m.id}','${key}','y')"></td>
+            <td class="yn-cell"><input type="radio" name="co-${m.id}-${key}" ${m.closeout[key]==='na'?'checked':''} onchange="updCloseout('${m.id}','${key}','na')"></td>
+          </tr>`).join('')}
+      </tbody>
+    </table>
+    <div class="section-title"><div class="bar"></div>Closing Signatures</div>
+    ${renderSignoffBox(m,'MOC Lead — Close-out',m.signoffs['MOC Lead Closeout']||{status:'pending'},'MOC Lead Closeout','MOC Lead')}
+    ${renderSignoffBox(m,'Process Safety — Close-out',m.signoffs['Process Safety Closeout']||{status:'pending'},'Process Safety Closeout','Process Safety')}
+  `;
+}
+
+/* ---------- Level 2 ---------- */
+function renderL2Scope(m){
+  return `
+    <div class="section-title"><div class="bar"></div>Part 1A — Scope of MOC</div>
+    <div class="field-row cols-2">
+      <div><label>MOC Title <span class="req">*</span></label><input type="text" value="${escAttr(m.title)}" onchange="updMoc('${m.id}','title',this.value)"></div>
+      <div><label>Asset</label><input type="text" value="${escAttr(m.asset||'')}" onchange="updMoc('${m.id}','asset',this.value)"></div>
+    </div>
+    <div class="field-row cols-2">
+      <div><label>Plant Area</label><input type="text" value="${escAttr(m.plantArea||'')}" onchange="updMoc('${m.id}','plantArea',this.value)"></div>
+      <div><label>MOC Lead</label><input type="text" value="${escAttr(m.mocLead||'')}" onchange="updMoc('${m.id}','mocLead',this.value)"></div>
+    </div>
+    <div class="field-group">
+      <label>Brief Summary <span class="req">*</span></label>
+      <textarea onchange="updMoc('${m.id}','summary',this.value)">${escTxt(m.summary||'')}</textarea>
+    </div>
+    <div class="field-group">
+      <label>Technical Basis for Change <span class="req">*</span></label>
+      <textarea onchange="updMoc('${m.id}','techBasis',this.value)">${escTxt(m.techBasis||'')}</textarea>
+    </div>
+    <div class="field-row cols-3">
+      <div>
+        <label>Type</label>
+        <div class="radio-group">
+          <label class="radio-opt"><input type="radio" name="perm-${m.id}" ${m.permanent?'checked':''} onchange="updMoc('${m.id}','permanent',true)"> Permanent</label>
+          <label class="radio-opt"><input type="radio" name="perm-${m.id}" ${!m.permanent?'checked':''} onchange="updMoc('${m.id}','permanent',false)"> Temporary</label>
+        </div>
+      </div>
+      <div><label>Start Date</label><input type="date" value="${m.startDate||''}" onchange="updMoc('${m.id}','startDate',this.value)"></div>
+      <div><label>End Date</label><input type="date" value="${m.endDate||''}" onchange="updMoc('${m.id}','endDate',this.value)"></div>
+    </div>
+
+    <div class="section-title"><div class="bar"></div>Part 1C — Process Safety / PHA Required?</div>
+    <div class="field-row cols-2">
+      <div>
+        <label>PHA Type Required</label>
+        <select onchange="updMoc('${m.id}','pha',this.value)">
+          ${['','What If Review','HAZOP','LOPA','Other','None Required'].map(o=>`<option ${m.pha===o?'selected':''}>${o||'— Select —'}</option>`).join('')}
+        </select>
+      </div>
+      <div>
+        <label>Justification (if None)</label>
+        <input type="text" value="${escAttr(m.phaJustification||'')}" onchange="updMoc('${m.id}','phaJustification',this.value)">
+      </div>
+    </div>
+  `;
+}
+
+const SAFETY_CHECK_CATEGORIES = {
+  'Design Changes': ['Flowrate','Velocity','Capacity','Pressure','Temperature','Level','Feed/Product Specifications','New Process Materials','Stream Compositions','Stream Mixing','Physical Properties','Changes of Phase','Sampling / Analysis','Operating Envelope','Design Conditions','Valve Types','Pipework','Novel Equipment','Item Modification','Materials of Construction','Structures / Plant Layout','Electrics','Power Distribution','Instrumentation','PLC / SIS Operation','DCS Operation','Critical Alarms','Shutdown Systems','Advanced Control','Inspection Strategy'],
+  'New Hazards Introduced': ['Overfilling','Emptying','Gas Blow-by','Reverse Flow','Surge','Overpressure','Vacuum Formation','Low / High Temperature','Contamination','Fouling / Deposition','Blockages / Freezing','Chemical Reactions','Two Phasing','Sloshing / Cyclic Loads','Flammability / Explosion','Op. Envelope Breaches','Pipework Stressing','Vibration Fatigue','Thermal Fatigue','Erosion','Embrittlement','Upstream / Downstream Impact','Internal / External Corrosion','Valve Line Up','Cross Connections','Passing Valves','Changed leak severity','Increased severity of human error','Chemical Exposure','Slip, Trip, Fall Hazard','Equipment Failure','Trip Failure','Source of Ignition','Static / Lightning','Access Restrictions','Loss of Service','Combustible Dust','Toxicity','Radiation Exposure','Lifting Activities','O2 Deficient Atmosphere'],
+  'Safeguards Affected / Required': ['Flaring / Vent / Relief Systems','Fire Protection systems','Thermal Relief','Isolation requirements','NRVs','Restriction Orifices','Remote Isolation','Pipe Specifications','Safety Showers / Eye Washes','Grounding / Bonding','Locking / Interlocking','Secondary Containment','Tertiary Containment','Purging / Inerting','Lighting','Area Classification','Freeze Precautions','Facility Siting','Instrumentation','Trips / ESD appraisal','Control system design','Control Valve Failure mode','Duplication / Redundancy','Access / Escape','Shutdown / Start up','Procedures / Training','Emergency Response Plan','Fire Fighting Plans','Leak detection','Fire / Gas detection','Paving / Drainage','Personnel Protection','Corrosion Monitoring','Ventilation'],
+  'Environment': ['Toxicity','Smell','Noise','EO / Vent Emissions','Community Air Quality','Spill Prevention','Gas Detection','Relief Vents','Storm Water','Effluent Treatment','Mixing Effluents','Plant Drainage','Dust Emissions','Solids Disposal','Liquids Waste','Energy Conservation','LDAR','RMP'],
+  'Operations & Maintenance': ['Changes in alarm handling','Complexity of Operations','Clarity of Instructions','Clarity of Drawings','Increased Distractions','Manning / Manpower','Change in Mental Workload','Changes in Time Pressure','Visual Displays','Labelling & Signs','Changes to Controls','Platforms / Walkways','Changes in Physical Workload','Access Openings','Awkward or Static Postures','Manual Handling','Welding Requirements','Lighting','Temperature','Noise','Vibration'],
+  'Procedures & Regulations': ['Air Permit','Wastewater Discharge Permit','Fire Suppression System','Toxic Gas Monitoring','New Chemical','NPDES (SWPPP)','SPCC','Waste Disposal','RMP','PSM','DOT - HAZMAT'],
+  'Personnel': ['Manages Area Operations','Manages Area Personnel','Manages Contract Personnel','Issues Permits','Hazard Reviews','Incident Reviews','Training','Coordinates On-site Drills','Safety Committee','Area Compliance','Mechanical Integrity','Operating Envelopes','Operating Procedures']
+};
+
+function renderL2Safety(m){
+  if(!m.safetyChecks) m.safetyChecks = {};
+  const cats = Object.entries(SAFETY_CHECK_CATEGORIES);
+  return `
+    <div class="info-banner"><span class="ico">ⓘ</span><div>Appendix A — Tick those issues which could have a <strong>moderate or significant impact</strong> on the thorough preparation of this MOC.</div></div>
+    ${cats.map(([cat,items])=>`
+      <details ${cat==='Design Changes'?'open':''}>
+        <summary>${cat} <span style="color:var(--grey-med);font-weight:400;font-size:11px;margin-left:6px">${Object.keys(m.safetyChecks).filter(k=>k.startsWith(cat+'::')).length} selected</span></summary>
+        <div>
+          <div class="checklist">
+            ${items.map(item=>{
+              const key = cat+'::'+item;
+              const checked = !!m.safetyChecks[key];
+              return `<label class="check-opt"><input type="checkbox" ${checked?'checked':''} onchange="toggleSafety('${m.id}','${escAttr(key)}',this.checked)"> ${item}</label>`;
+            }).join('')}
+          </div>
+          ${Object.keys(m.safetyChecks).filter(k=>k.startsWith(cat+'::') && m.safetyChecks[k]).map(k=>{
+            const item = k.split('::')[1];
+            const assessment = m.safetyAssessments?.[k]||'';
+            return `<div style="margin-top:10px;padding:10px;background:#fff;border-radius:8px"><label style="margin-bottom:4px">Assessment — ${item}</label><textarea style="min-height:50px;font-size:12.5px" onchange="updAssessment('${m.id}','${escAttr(k)}',this.value)" placeholder="Describe assessment for this item">${escTxt(assessment)}</textarea></div>`;
+          }).join('')}
+        </div>
+      </details>
+    `).join('')}
+  `;
+}
+
+function renderL2Implementation(m){
+  return `
+    <div class="section-title"><div class="bar"></div>Part 3 — Modification Completion / Handover & Commissioning</div>
+    <div class="info-banner"><span class="ico">ⓘ</span><div>Sign to acknowledge modification has been installed per Approved-for-Construction design, all required documentation is updated, operating instructions and training are complete, and commissioning may proceed.</div></div>
+    ${renderSignoffBox(m,'Production Manager — Handover',m.signoffs['Production Manager Handover']||{status:'pending'},'Production Manager Handover','Production Manager')}
+    <div class="section-title"><div class="bar"></div>PSSR (Pre-Startup Safety Review)</div>
+    <div class="field-row cols-3">
+      <div>
+        <label>PSSR Required</label>
+        <div class="radio-group">
+          <label class="radio-opt"><input type="radio" name="pssr-${m.id}" ${m.pssrRequired==='y'?'checked':''} onchange="updMoc('${m.id}','pssrRequired','y')"> Yes</label>
+          <label class="radio-opt"><input type="radio" name="pssr-${m.id}" ${m.pssrRequired==='n'?'checked':''} onchange="updMoc('${m.id}','pssrRequired','n')"> No</label>
+        </div>
+      </div>
+      <div>
+        <label>PSSR Level</label>
+        <select onchange="updMoc('${m.id}','pssrLevel',this.value)">
+          <option ${m.pssrLevel===''?'selected':''}>—</option>
+          <option ${m.pssrLevel==='Level 1'?'selected':''}>Level 1 (simple, 1 page)</option>
+          <option ${m.pssrLevel==='Level 2'?'selected':''}>Level 2 (full, 21 pages)</option>
+        </select>
+      </div>
+      <div>
+        <label>PSSR Completion Date</label>
+        <input type="date" value="${m.pssrDate||''}" onchange="updMoc('${m.id}','pssrDate',this.value)">
+      </div>
+    </div>
+    <div class="section-title"><div class="bar"></div>Punch List Items (PSSR Actions)</div>
+    <div style="font-size:12px;color:var(--grey-med);margin-bottom:10px">A = Required prior to reinventorying hazardous chemicals · B = Required during hot commissioning · C = To be completed after start-up / prior to MOC closure</div>
+    ${renderPunchList(m)}
+  `;
+}
+
+function renderPunchList(m){
+  if(!m.punchList) m.punchList=[];
+  return `
+    <table class="checklist-table">
+      <thead><tr><th>#</th><th>Description</th><th>P&ID</th><th>Type</th><th>Complete</th><th>Resp.</th><th></th></tr></thead>
+      <tbody>
+        ${m.punchList.map((p,i)=>`
+          <tr>
+            <td>${i+1}</td>
+            <td><input type="text" value="${escAttr(p.desc||'')}" onchange="updPunch('${m.id}',${i},'desc',this.value)"></td>
+            <td style="width:90px"><input type="text" value="${escAttr(p.pid||'')}" onchange="updPunch('${m.id}',${i},'pid',this.value)"></td>
+            <td style="width:70px"><select onchange="updPunch('${m.id}',${i},'type',this.value)"><option ${p.type==='A'?'selected':''}>A</option><option ${p.type==='B'?'selected':''}>B</option><option ${p.type==='C'?'selected':''}>C</option></select></td>
+            <td style="width:90px"><select onchange="updPunch('${m.id}',${i},'complete',this.value)"><option value="N" ${p.complete==='N'?'selected':''}>Open</option><option value="Y" ${p.complete==='Y'?'selected':''}>Closed</option></select></td>
+            <td style="width:130px"><input type="text" value="${escAttr(p.resp||'')}" onchange="updPunch('${m.id}',${i},'resp',this.value)"></td>
+            <td><button class="btn btn-ghost btn-sm" onclick="removePunch('${m.id}',${i})">×</button></td>
+          </tr>`).join('')}
+      </tbody>
+    </table>
+    <button class="btn btn-secondary btn-sm" style="margin-top:10px" onclick="addPunch('${m.id}')">+ Add Punch List Item</button>
+  `;
+}
+
+function renderL2CloseOut(m){
+  return `
+    <div class="section-title"><div class="bar"></div>Part 4A — Close Out</div>
+    <div class="info-banner"><span class="ico">ⓘ</span><div>MOC Lead confirms that the MOC is working as designed and all required documentation is complete. Any outstanding punch list items are completed or included in an Action Tracker.</div></div>
+    ${renderSignoffBox(m,'MOC Lead — Close-out',m.signoffs['MOC Lead Closeout']||{status:'pending'},'MOC Lead Closeout','MOC Lead')}
+    ${renderSignoffBox(m,'Process Safety — Close-out',m.signoffs['Process Safety Closeout']||{status:'pending'},'Process Safety Closeout','Process Safety')}
+    ${!m.permanent?`
+      <div class="section-title"><div class="bar"></div>Part 4B — Temporary Modifications ONLY</div>
+      <div class="info-banner warn"><span class="ico">⚠</span><div>If the plant/system was not fully restored to original by the end date in Part 1A, review the Temporary Modification and revise the review dates below.</div></div>
+      <div class="field-row cols-3">
+        <div><label>Review 1 — Reviewer</label><input type="text" onchange="updTempReview('${m.id}',0,'name',this.value)" value="${escAttr(m.tempReview?.[0]?.name||'')}"></div>
+        <div><label>Assumptions Valid?</label><select onchange="updTempReview('${m.id}',0,'valid',this.value)"><option>—</option><option>Yes</option><option>No</option></select></div>
+        <div><label>New Extension Date</label><input type="date" onchange="updTempReview('${m.id}',0,'extDate',this.value)" value="${m.tempReview?.[0]?.extDate||''}"></div>
+      </div>
+      <div class="field-row cols-3">
+        <div><label>Review 2 — Reviewer</label><input type="text" onchange="updTempReview('${m.id}',1,'name',this.value)" value="${escAttr(m.tempReview?.[1]?.name||'')}"></div>
+        <div><label>Assumptions Valid?</label><select onchange="updTempReview('${m.id}',1,'valid',this.value)"><option>—</option><option>Yes</option><option>No</option></select></div>
+        <div><label>New Extension Date</label><input type="date" onchange="updTempReview('${m.id}',1,'extDate',this.value)" value="${m.tempReview?.[1]?.extDate||''}"></div>
+      </div>
+      <div class="field-row cols-3">
+        <div><label>Review 3 — Reviewer</label><input type="text" onchange="updTempReview('${m.id}',2,'name',this.value)" value="${escAttr(m.tempReview?.[2]?.name||'')}"></div>
+        <div><label>Assumptions Valid?</label><select onchange="updTempReview('${m.id}',2,'valid',this.value)"><option>—</option><option>Yes</option><option>No</option></select></div>
+        <div><label>New Extension Date</label><input type="date" onchange="updTempReview('${m.id}',2,'extDate',this.value)" value="${m.tempReview?.[2]?.extDate||''}"></div>
+      </div>
+    `:''}
+  `;
+}
+
+const DOC_CATEGORIES = {
+  'SSHE':['SSHE Manual','New Chemical Approval & SDS','Fire Suppression System','Emergency Response Manual','Regulatory Permit (SPCC, SWPPP, etc.)','RMP Updated','LDAR Updated'],
+  'Process Design / Engineering':['Data Sheets (Equipment & Instruments)','Design / Operating Guidelines','Operating Window','Heat & Mass Balance','Process Flow Diagrams','P&IDs','Sizing Calculations','Control Philosophy','CGMP / Food Contact Impact Approved','Operability & Maintainability Design Review','Hazard Review'],
+  'Mechanical Design':['Facility Layout','General Arrangement','Piping Route & Layout','Isometrics','Pipe Supports','Mechanical Design / ASME Calcs / Permits'],
+  'E&I Design':['Loop / IO / Network / Panel Drawings','Single Line Diagram','Electrical / Instrument List','Area Classification Drawing','HMI / PLC / DCS Updated'],
+  'Commissioning':['Commissioning Plan','Commissioning SOPs','PSSR','Punch List'],
+  'Operations':['Training / Notification Completed & Documented','SOPs','Labelling','LOTO SOP','Training Manuals'],
+  'Maintenance / Reliability':['Add / Modify / Delete Form Submitted','Preventative / Predictive Maintenance','Procured Required Equipment Spares','Training / Notification Completed & Documented','Updated Equipment Files','Updated Master Equipment / Relief Valve List']
+};
+
+function renderL2Docs(m){
+  if(!m.docsChecklist) m.docsChecklist={};
+  return `
+    <div class="info-banner"><span class="ico">ⓘ</span><div>Appendix B — Technical Authority / Owner Manager to assign required documents. Document owner initials when complete.</div></div>
+    ${Object.entries(DOC_CATEGORIES).map(([cat,docs])=>`
+      <details ${cat==='SSHE'?'open':''}>
+        <summary>${cat}</summary>
+        <div>
+          <table class="checklist-table">
+            <thead><tr><th>Document</th><th>Owner</th><th class="yn-cell">Detail Design</th><th class="yn-cell">Commissioning</th><th class="yn-cell">Close-out</th><th>Completed</th></tr></thead>
+            <tbody>
+              ${docs.map(d=>{
+                const k = cat+'::'+d;
+                const v = m.docsChecklist[k] || {};
+                return `<tr>
+                  <td style="font-size:12.5px">${d}</td>
+                  <td style="width:120px"><input type="text" value="${escAttr(v.owner||'')}" onchange="updDoc('${m.id}','${escAttr(k)}','owner',this.value)" placeholder="—"></td>
+                  <td class="yn-cell"><input type="checkbox" ${v.dd?'checked':''} onchange="updDoc('${m.id}','${escAttr(k)}','dd',this.checked)"></td>
+                  <td class="yn-cell"><input type="checkbox" ${v.comm?'checked':''} onchange="updDoc('${m.id}','${escAttr(k)}','comm',this.checked)"></td>
+                  <td class="yn-cell"><input type="checkbox" ${v.close?'checked':''} onchange="updDoc('${m.id}','${escAttr(k)}','close',this.checked)"></td>
+                  <td style="width:100px"><input type="date" value="${v.completed||''}" onchange="updDoc('${m.id}','${escAttr(k)}','completed',this.value)"></td>
+                </tr>`;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
+      </details>
+    `).join('')}
+  `;
+}
+
+function renderDocsTab(m){
+  return `
+    <div class="info-banner"><span class="ico">ⓘ</span><div>Attach supporting documentation. (Demo: attachments are not stored — list references here.)</div></div>
+    <div class="field-group">
+      <label>Document References</label>
+      <textarea onchange="updMoc('${m.id}','docRefs',this.value)" placeholder="P&ID 301-A, SOP-R301-02, Equipment File R-301, RV-301 sizing calc, ...">${escTxt(m.docRefs||'')}</textarea>
+    </div>
+  `;
+}
+
+/* ---------- MOOC ---------- */
+function renderMOOCScope(m){
+  return `
+    <div class="section-title"><div class="bar"></div>Part 1A — Scope of MOOC</div>
+    <div class="field-row cols-2">
+      <div><label>Department / Area</label><input type="text" value="${escAttr(m.department||'')}" onchange="updMoc('${m.id}','department',this.value)"></div>
+      <div><label>MOOC Lead</label><input type="text" value="${escAttr(m.moocLead||'')}" onchange="updMoc('${m.id}','moocLead',this.value)"></div>
+    </div>
+    <div class="field-row cols-2">
+      <div><label>Job Title</label><input type="text" value="${escAttr(m.jobTitle||'')}" onchange="updMoc('${m.id}','jobTitle',this.value)"></div>
+      <div><label>MOOC Title</label><input type="text" value="${escAttr(m.title)}" onchange="updMoc('${m.id}','title',this.value)"></div>
+    </div>
+    <div class="field-group">
+      <label>Reason for MOOC</label>
+      <div class="radio-group">
+        <label class="radio-opt"><input type="radio" name="reason-${m.id}" ${m.moocReason==='resigned'?'checked':''} onchange="updMoc('${m.id}','moocReason','resigned')"> Resigned before placement (Temporary)</label>
+        <label class="radio-opt"><input type="radio" name="reason-${m.id}" ${m.moocReason==='transfer'?'checked':''} onchange="updMoc('${m.id}','moocReason','transfer')"> Transferred for another assignment</label>
+      </div>
+    </div>
+    <div class="field-group">
+      <label>Job Description</label>
+      <textarea onchange="updMoc('${m.id}','jobDescription',this.value)" placeholder="Mention any specific task in the JD that impacts continuity of site operation in compliance.">${escTxt(m.jobDescription||'')}</textarea>
+    </div>
+    <div class="field-row cols-3">
+      <div>
+        <label>Type</label>
+        <div class="radio-group">
+          <label class="radio-opt"><input type="radio" name="perm-${m.id}" ${m.permanent?'checked':''} onchange="updMoc('${m.id}','permanent',true)"> Permanent</label>
+          <label class="radio-opt"><input type="radio" name="perm-${m.id}" ${!m.permanent?'checked':''} onchange="updMoc('${m.id}','permanent',false)"> Temporary</label>
+        </div>
+      </div>
+      <div><label>Start Date</label><input type="date" value="${m.startDate||''}" onchange="updMoc('${m.id}','startDate',this.value)"></div>
+      <div><label>End Date</label><input type="date" value="${m.endDate||''}" onchange="updMoc('${m.id}','endDate',this.value)"></div>
+    </div>
+  `;
+}
+
+const MOOC_TRANSITION_ITEMS = [
+  'Update Environmental permitting / agencies designations',
+  'Update Emergency Response Plan',
+  'Reassign Intelex incidents & action items',
+  'Reassign MOCs and MOC actions',
+  'Reassign PSM audit action items',
+  'Reassign PHA action items',
+  'Update reporting hierarchy in HR management system'
+];
+
+function renderMOOCChecklist(m){
+  if(!m.transitionPlan) m.transitionPlan=[];
+  // ensure all default items exist
+  MOOC_TRANSITION_ITEMS.forEach(item=>{
+    if(!m.transitionPlan.find(t=>t.element===item)){
+      m.transitionPlan.push({element:item,responsibility:'',detail:'',signoff:''});
+    }
+  });
+  return `
+    <div class="info-banner"><span class="ico">ⓘ</span><div>Appendix A — Reassigning Responsibilities Checklist. Document how each responsibility will be transitioned.</div></div>
+    <table class="checklist-table">
+      <thead><tr><th>Transition Plan Element</th><th>Responsibility</th><th>Transition Plan Detail</th><th>Completion Sign-off</th><th></th></tr></thead>
+      <tbody>
+        ${m.transitionPlan.map((t,i)=>`
+          <tr>
+            <td style="font-size:12.5px"><input type="text" value="${escAttr(t.element)}" onchange="updTrans('${m.id}',${i},'element',this.value)"></td>
+            <td><input type="text" value="${escAttr(t.responsibility)}" onchange="updTrans('${m.id}',${i},'responsibility',this.value)"></td>
+            <td><input type="text" value="${escAttr(t.detail)}" onchange="updTrans('${m.id}',${i},'detail',this.value)"></td>
+            <td style="width:140px"><input type="text" value="${escAttr(t.signoff)}" onchange="updTrans('${m.id}',${i},'signoff',this.value)" placeholder="Initials / Date"></td>
+            <td><button class="btn btn-ghost btn-sm" onclick="removeTrans('${m.id}',${i})">×</button></td>
+          </tr>`).join('')}
+      </tbody>
+    </table>
+    <button class="btn btn-secondary btn-sm" style="margin-top:10px" onclick="addTrans('${m.id}')">+ Add Row</button>
+  `;
+}
+
+function renderMOOCCloseout(m){
+  return `
+    <div class="section-title"><div class="bar"></div>Part 3A — Close Out</div>
+    <div class="info-banner"><span class="ico">ⓘ</span><div>MOOC Lead confirms that the transition is working as designed and the Reassigning Responsibilities Checklist is complete. Any outstanding items are included in an Action Tracker.</div></div>
+    ${renderSignoffBox(m,'MOOC Lead — Close-out',m.signoffs['Close-out: MOOC Lead']||{status:'pending'},'Close-out: MOOC Lead','MOC Lead')}
+    ${renderSignoffBox(m,'Process Safety — Close-out',m.signoffs['Close-out: Process Safety']||{status:'pending'},'Close-out: Process Safety','Process Safety')}
+    ${!m.permanent?`
+      <div class="section-title"><div class="bar"></div>Part 3B — Temporary Changes ONLY</div>
+      <div class="info-banner warn"><span class="ico">⚠</span><div>Has the resource been substituted by someone within the company or through a new hire by the date specified in Part 1A? If yes, Site Manager signs to acknowledge interim responsibilities have been reassigned.</div></div>
+      ${renderSignoffBox(m,'Site Manager — Interim',m.signoffs['Site Manager Interim']||{status:'pending'},'Site Manager Interim','Site Manager')}
+    `:''}
+  `;
+}
+
+/* ---------- BYPASS ---------- */
+function renderBypassDetails(m){
+  return `
+    <div class="info-banner warn"><span class="ico">⚠</span><div><strong>Safety System Bypass / Impairment.</strong> All bypasses must have an alternate protection plan. Bypasses over 72 hours require additional approvals.</div></div>
+    <div class="section-title"><div class="bar"></div>Bypass Identification</div>
+    <div class="field-row cols-2">
+      <div><label>Area</label><input type="text" value="${escAttr(m.plantArea||'')}" onchange="updMoc('${m.id}','plantArea',this.value)"></div>
+      <div><label>MOC Title</label><input type="text" value="${escAttr(m.title)}" onchange="updMoc('${m.id}','title',this.value)"></div>
+    </div>
+    <div class="field-row cols-3">
+      <div><label>Bypass Start Date/Time <span class="req">*</span></label><input type="date" value="${m.startDate||''}" onchange="updMoc('${m.id}','startDate',this.value)"></div>
+      <div><label>Expected Completion <span class="req">*</span></label><input type="date" value="${m.endDate||''}" onchange="updMoc('${m.id}','endDate',this.value)"></div>
+      <div><label>Related MOC #</label><input type="text" value="${escAttr(m.relatedMoc||'')}" onchange="updMoc('${m.id}','relatedMoc',this.value)" placeholder="Optional"></div>
+    </div>
+    <div class="field-group">
+      <label>Bypassed Safety Device — ID and Description <span class="req">*</span></label>
+      <textarea onchange="updMoc('${m.id}','bypassDevice',this.value)" placeholder="e.g. LSHH-110 (High-High Level Switch, triggers feed pump trip)">${escTxt(m.bypassDevice||'')}</textarea>
+    </div>
+    <div class="field-group">
+      <label>Description of Bypass</label>
+      <textarea onchange="updMoc('${m.id}','bypassDescription',this.value)" placeholder="How is the device being bypassed?">${escTxt(m.bypassDescription||'')}</textarea>
+    </div>
+    <div class="field-group">
+      <label>Equipment Protected by the Safety System</label>
+      <textarea onchange="updMoc('${m.id}','protectedEquipment',this.value)">${escTxt(m.protectedEquipment||'')}</textarea>
+    </div>
+    <div class="field-group">
+      <label>Hazard the Safety Device Protects Against <span style="color:var(--grey-med);font-weight:400">(reference PHA when possible)</span></label>
+      <textarea onchange="updMoc('${m.id}','hazardExplanation',this.value)">${escTxt(m.hazardExplanation||'')}</textarea>
+    </div>
+    <div class="field-group">
+      <label>Reason for Bypass / Impairment <span class="req">*</span></label>
+      <textarea onchange="updMoc('${m.id}','bypassReason',this.value)">${escTxt(m.bypassReason||'')}</textarea>
+    </div>
+    <div class="field-group">
+      <label>Alternate Protection Plan <span class="req">*</span></label>
+      <textarea onchange="updMoc('${m.id}','altProtection',this.value)" placeholder="What compensating controls are in place during the bypass?">${escTxt(m.altProtection||'')}</textarea>
+    </div>
+  `;
+}
+
+function renderBypassLogTab(m){
+  if(!m.dailyLog) m.dailyLog=[];
+  return `
+    <div class="info-banner"><span class="ico">ⓘ</span><div>Daily verification log. Operations personnel verify the alternate protection plan is in place each shift. >72hr requires extension approval (see Approvals tab).</div></div>
+    <table class="checklist-table">
+      <thead><tr><th>Date</th><th>Shift</th><th>Verified By</th><th>Notes</th><th></th></tr></thead>
+      <tbody>
+        ${m.dailyLog.map((d,i)=>`
+          <tr>
+            <td style="width:130px"><input type="date" value="${d.date||''}" onchange="updLog('${m.id}',${i},'date',this.value)"></td>
+            <td style="width:90px"><select onchange="updLog('${m.id}',${i},'shift',this.value)"><option ${d.shift==='Day'?'selected':''}>Day</option><option ${d.shift==='Night'?'selected':''}>Night</option></select></td>
+            <td style="width:160px"><input type="text" value="${escAttr(d.initials||'')}" onchange="updLog('${m.id}',${i},'initials',this.value)"></td>
+            <td><input type="text" value="${escAttr(d.notes||'')}" onchange="updLog('${m.id}',${i},'notes',this.value)"></td>
+            <td><button class="btn btn-ghost btn-sm" onclick="removeLog('${m.id}',${i})">×</button></td>
+          </tr>`).join('')}
+      </tbody>
+    </table>
+    <button class="btn btn-secondary btn-sm" style="margin-top:10px" onclick="addLog('${m.id}')">+ Log Verification</button>
+    ${(()=>{
+      const start = m.startDate?new Date(m.startDate):null;
+      const now = new Date();
+      if(!start) return '';
+      const hours = (now - start)/(1000*60*60);
+      if(hours>72 && !m.signoffs['Production Manager Ext']){
+        return `<div class="info-banner warn" style="margin-top:14px"><span class="ico">⚠</span><div><strong>Over 72 hours.</strong> Extension approvals required from Production Manager, Technical Authority, and EHSS Manager. See Approvals tab.</div></div>`;
+      }
+      return '';
+    })()}
+  `;
+}
+
+function renderBypassRestoration(m){
+  return `
+    <div class="info-banner success"><span class="ico">✓</span><div>Sign below to acknowledge that the safety system has been returned to service and is functioning correctly.</div></div>
+    <div class="field-row cols-2">
+      <div><label>Date Restored</label><input type="date" value="${m.dateRestored||''}" onchange="updMoc('${m.id}','dateRestored',this.value)"></div>
+      <div><label>Time Restored</label><input type="text" value="${escAttr(m.timeRestored||'')}" onchange="updMoc('${m.id}','timeRestored',this.value)" placeholder="HH:MM"></div>
+    </div>
+    ${renderSignoffBox(m,'MOC Lead — Restoration Verified',m.signoffs['Restoration MOC Lead']||{status:'pending'},'Restoration MOC Lead','MOC Lead')}
+  `;
+}
+
+/* ---------- ADDENDUM ---------- */
+function renderAddendumScope(m){
+  return `
+    <div class="section-title"><div class="bar"></div>Scope of MOC Addendum</div>
+    <div class="field-row cols-2">
+      <div><label>Parent MOC #</label><input type="text" value="${escAttr(m.parentMoc||'')}" onchange="updMoc('${m.id}','parentMoc',this.value)" placeholder="MOC-2026-XXXX"></div>
+      <div><label>Addendum Title</label><input type="text" value="${escAttr(m.title)}" onchange="updMoc('${m.id}','title',this.value)"></div>
+    </div>
+    <div class="field-group">
+      <label>Brief Summary of Addendum</label>
+      <textarea onchange="updMoc('${m.id}','summary',this.value)">${escTxt(m.summary||'')}</textarea>
+    </div>
+    <div class="field-group">
+      <label>Technical Basis for Change</label>
+      <textarea onchange="updMoc('${m.id}','techBasis',this.value)">${escTxt(m.techBasis||'')}</textarea>
+    </div>
+    <div class="field-group">
+      <label>Safety & Environmental Assessment</label>
+      <textarea onchange="updMoc('${m.id}','safetyEnvImpact',this.value)">${escTxt(m.safetyEnvImpact||'')}</textarea>
+    </div>
+  `;
+}
+
+/* ============================================================
+   SIGN-OFFS
+   ============================================================ */
+function renderSignoffs(m){
+  return `
+    <div class="info-banner"><span class="ico">ⓘ</span><div>Each approver below must sign to grant approval. Click "Sign as..." if you hold the required role. The current user is <strong>${currentUser().name}</strong> (${currentUser().role}).</div></div>
+    <div class="signoff-grid">
+      ${Object.entries(m.signoffs).map(([slot,so])=>renderSignoffBox(m,slot,so,slot,slot.replace(/ Closeout$| Handover$| Interim$| Ext$/,''))).join('')}
+    </div>
+  `;
+}
+
+function renderSignoffBox(m,label,so,slotKey,permKey){
+  const can = canSignOff(permKey);
+  const isSigned = so.status==='signed';
+  const isRejected = so.status==='rejected';
+  return `
+    <div class="signoff ${isSigned?'signed':isRejected?'rejected':'pending'}">
+      <div class="signoff-info">
+        <div class="signoff-role">${label}</div>
+        <div class="signoff-person">${so.name||'— Awaiting signature —'}</div>
+        ${so.notes?`<div style="font-size:12px;color:var(--grey-med);margin-top:4px;font-style:italic">"${escTxt(so.notes)}"</div>`:''}
+      </div>
+      <div class="signoff-stamp">
+        ${isSigned?`
+          <div class="stamp">✓ Signed</div>
+          <div class="date">${fmtDate(so.date)}</div>
+        `:isRejected?`
+          <div class="stamp" style="border-color:var(--red);color:var(--red)">✕ Rejected</div>
+          <div class="date">${fmtDate(so.date)}</div>
+        `:`
+          <button class="btn ${can?'btn-primary':'btn-secondary'} btn-sm" onclick="signOff('${m.id}','${slotKey}','signed')" ${can?'':'disabled'} title="${can?'Sign as '+currentUser().role:'Requires: '+(ROLE_PERMS[permKey]||[]).join(' or ')}">${can?'✎ Sign as '+currentUser().role:'⌒ Not your role'}</button>
+          ${can?`<button class="btn btn-danger btn-sm" onclick="signOff('${m.id}','${slotKey}','rejected')">Reject</button>`:''}
+        `}
+      </div>
+    </div>
+  `;
+}
+
+/* ============================================================
+   ACTIONS / MUTATIONS
+   ============================================================ */
+function updMoc(id,key,val){
+  const m = mocs.find(x=>x.id===id);
+  if(!m) return;
+  m[key]=val;
+  saveState();
+  // Don't re-render the whole tree for every keystroke; only re-render header
+  // But for radios / selects we want to refresh
+  if(['permanent','permanence','pha','pssrRequired','moocReason'].includes(key)) render();
+}
+function updCheck(id,itemKey,field,val){
+  const m = mocs.find(x=>x.id===id);
+  if(!m.checklist) m.checklist={};
+  if(!m.checklist[itemKey]) m.checklist[itemKey]={};
+  m.checklist[itemKey][field]=val;
+  saveState();
+}
+function updCloseout(id,key,val){
+  const m = mocs.find(x=>x.id===id);
+  if(!m.closeout) m.closeout={};
+  m.closeout[key]=val;
+  saveState();
+}
+function toggleSafety(id,key,checked){
+  const m = mocs.find(x=>x.id===id);
+  if(!m.safetyChecks) m.safetyChecks={};
+  m.safetyChecks[key]=checked;
+  saveState();
+  render();
+}
+function updAssessment(id,key,val){
+  const m = mocs.find(x=>x.id===id);
+  if(!m.safetyAssessments) m.safetyAssessments={};
+  m.safetyAssessments[key]=val;
+  saveState();
+}
+function updDoc(id,key,field,val){
+  const m = mocs.find(x=>x.id===id);
+  if(!m.docsChecklist) m.docsChecklist={};
+  if(!m.docsChecklist[key]) m.docsChecklist[key]={};
+  m.docsChecklist[key][field]=val;
+  saveState();
+}
+function addPunch(id){
+  const m = mocs.find(x=>x.id===id);
+  if(!m.punchList) m.punchList=[];
+  m.punchList.push({desc:'',pid:'',type:'C',complete:'N',resp:''});
+  saveState();render();
+}
+function updPunch(id,i,field,val){
+  const m = mocs.find(x=>x.id===id);
+  m.punchList[i][field]=val;saveState();
+}
+function removePunch(id,i){
+  const m = mocs.find(x=>x.id===id);
+  m.punchList.splice(i,1);saveState();render();
+}
+function addTrans(id){
+  const m = mocs.find(x=>x.id===id);
+  if(!m.transitionPlan) m.transitionPlan=[];
+  m.transitionPlan.push({element:'',responsibility:'',detail:'',signoff:''});
+  saveState();render();
+}
+function updTrans(id,i,field,val){
+  const m = mocs.find(x=>x.id===id);
+  m.transitionPlan[i][field]=val;saveState();
+}
+function removeTrans(id,i){
+  const m = mocs.find(x=>x.id===id);
+  m.transitionPlan.splice(i,1);saveState();render();
+}
+function updTempReview(id,i,field,val){
+  const m = mocs.find(x=>x.id===id);
+  if(!m.tempReview) m.tempReview=[{},{},{}];
+  m.tempReview[i][field]=val;saveState();
+}
+function addLog(id){
+  const m = mocs.find(x=>x.id===id);
+  if(!m.dailyLog) m.dailyLog=[];
+  m.dailyLog.push({date:todayStr(),shift:'Day',initials:currentUser().initials,notes:''});
+  saveState();render();
+}
+function updLog(id,i,field,val){
+  const m = mocs.find(x=>x.id===id);
+  m.dailyLog[i][field]=val;saveState();
+}
+function removeLog(id,i){
+  const m = mocs.find(x=>x.id===id);
+  m.dailyLog.splice(i,1);saveState();render();
+}
+
+function signOff(id,slot,status){
+  const m = mocs.find(x=>x.id===id);
+  const u = currentUser();
+  if(!m.signoffs[slot]) m.signoffs[slot]={};
+  if(status==='rejected'){
+    const reason = prompt('Reason for rejection (sent back to MOC Lead):');
+    if(reason===null) return;
+    m.signoffs[slot].notes = reason;
+    m.signoffs[slot].status='rejected';
+    m.signoffs[slot].name = u.name;
+    m.signoffs[slot].date = todayStr();
+    m.status='draft';m.wfStep='draft';
+    m.activity.push({user:u.name,action:`rejected ${slot} sign-off: "${reason}"`,date:nowStamp()});
+    toast(`Rejected — MOC returned to Draft`,'error');
+  } else {
+    m.signoffs[slot]={name:u.name,date:todayStr(),status:'signed'};
+    m.activity.push({user:u.name,action:`signed ${slot}`,date:nowStamp()});
+    toast(`Signed as ${u.role}`,'success');
+    // auto-advance if all primary signoffs done
+    if(allSigned(m) && m.status==='review'){
+      // don't auto-advance; let user click. But notify.
+    }
+  }
+  saveState();render();
+}
+
+function allSigned(m){
+  // Only primary signoffs (not Closeout/Handover ones) for advance
+  const primary = Object.entries(m.signoffs).filter(([k])=>!k.includes('Closeout') && !k.includes('Handover') && !k.includes('Interim') && !k.includes('Restoration'));
+  return primary.length>0 && primary.every(([,so])=>so.status==='signed');
+}
+
+function submitForReview(id){
+  const m = mocs.find(x=>x.id===id);
+  if(!m.title || m.title.startsWith('(Untitled')){toast('Please add a title before submitting','error');return}
+  if(!m.summary){toast('Please add a brief summary','error');return}
+  m.status='review';m.wfStep='review';
+  m.activity.push({user:currentUser().name,action:'submitted MOC for review',date:nowStamp()});
+  saveState();render();
+  toast('Submitted for review');
+}
+function advanceWorkflow(id){
+  const m = mocs.find(x=>x.id===id);
+  m.status='implement';m.wfStep='implement';
+  m.activity.push({user:currentUser().name,action:'advanced MOC to Implementation',date:nowStamp()});
+  saveState();render();
+  toast('Advanced to Implementation');
+}
+function advanceToCloseout(id){
+  const m = mocs.find(x=>x.id===id);
+  m.status='closeout';m.wfStep='closeout';
+  m.activity.push({user:currentUser().name,action:'moved MOC to Close-out',date:nowStamp()});
+  saveState();render();
+  toast('Moved to Close-out');
+}
+function closeMoc(id){
+  if(!confirm('Close this MOC? This indicates all sign-offs and documentation are complete.')) return;
+  const m = mocs.find(x=>x.id===id);
+  m.status='closed';m.wfStep='closed';
+  m.activity.push({user:currentUser().name,action:'CLOSED MOC',date:nowStamp()});
+  saveState();render();
+  toast('MOC closed successfully','success');
+}
+
+function addComment(id){
+  const txt = $('#commentInput').value.trim();
+  if(!txt) return;
+  const m = mocs.find(x=>x.id===id);
+  m.comments.push({user:currentUser().name,text:txt,date:nowStamp()});
+  saveState();render();
+}
+
+function saveCurrentMoc(id){
+  saveState();
+  toast('Saved');
+}
+
+/* ============================================================
+   PRINT / EXPORT
+   ============================================================ */
+function printMoc(){
+  // Show all tabs for printing
+  const allTabs = document.querySelector('.all-tabs-print');
+  if(allTabs) allTabs.style.display='block';
+  const activeTabContent = document.querySelector('.tab-content');
+  if(activeTabContent) activeTabContent.style.display='none';
+  window.print();
+  setTimeout(()=>{
+    if(allTabs) allTabs.style.display='none';
+    if(activeTabContent) activeTabContent.style.display='block';
+  },500);
+}
+
+function exportAll(){
+  const rows = [['ID','Type','Title','Site','Owner','Status','Created','Start','End']];
+  mocs.filter(m=>m.site===state.currentSite).forEach(m=>{
+    rows.push([m.id,TYPE_LABEL[m.type],m.title,m.site,m.mocLead||m.moocLead||'',statusLabel(m.status),m.created,m.startDate||'',m.endDate||'']);
+  });
+  const csv = rows.map(r=>r.map(c=>`"${(c||'').toString().replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv],{type:'text/csv'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `MOC-Register-${state.currentSite.replace(/[, ]/g,'-')}-${todayStr()}.csv`;
+  a.click();
+  toast('Exported CSV');
+}
+
+/* ============================================================
+   UTIL
+   ============================================================ */
+function escAttr(s){return (s||'').toString().replace(/"/g,'&quot;').replace(/'/g,"&#39;")}
+function escTxt(s){return (s||'').toString().replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+document.querySelectorAll('.nav-item').forEach(n=>{
+  n.addEventListener('click',()=>{
+    if(n.dataset.action==='new-moc'){openModal('newMocModal');return}
+    if(n.dataset.view){
+      state.currentView = n.dataset.view;
+      state.activeMocId = null;
+      state.activeTab = null;
+      render();
+    }
+  });
+});
+
+$('#globalSearch').addEventListener('input',e=>{
+  state.searchTerm = e.target.value;
+  if(state.currentView!=='register'){
+    state.currentView = 'register';
+    state.activeMocId = null;
+  }
+  render();
+});
+
+loadState();
+buildUserMenu();
+render();
+</script>
+</body>
+</html>
